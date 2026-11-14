@@ -114,8 +114,23 @@ def main():
             print("TikTok credentials missing -> post skipped, package only")
         else:
             tokens = tiktok.refresh_access_token(key, secret, refresh)
+            new_refresh = tokens.get("refresh_token", "")
             with open(os.path.join(outdir, "rotated_refresh_token.txt"), "w") as f:
-                f.write(tokens.get("refresh_token", ""))
+                f.write(new_refresh)
+            if new_refresh and new_refresh != refresh:
+                # TikTok rotates the refresh token on every refresh; persist
+                # the new one back to .env or the next run cannot refresh.
+                env_path = os.path.join(ROOT, ".env")
+                lines = []
+                if os.path.exists(env_path):
+                    lines = open(env_path, encoding="utf-8").read().splitlines()
+                lines = [f"TIKTOK_REFRESH_TOKEN={new_refresh}" if l.startswith("TIKTOK_REFRESH_TOKEN=") else l
+                         for l in lines]
+                if not any(l.startswith("TIKTOK_REFRESH_TOKEN=") for l in lines):
+                    lines.append(f"TIKTOK_REFRESH_TOKEN={new_refresh}")
+                with open(env_path, "w", encoding="utf-8") as f:
+                    f.write("\n".join(lines) + "\n")
+                print("refresh token rotated -> .env updated")
             result = tiktok.post_video(tokens["access_token"], video, caption,
                                        mode=args.mode, privacy_level=args.privacy)
             package["post_result"] = result
