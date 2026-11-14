@@ -19,13 +19,28 @@ AUTH_URL = "https://www.tiktok.com/v2/auth/authorize/"
 TOKEN_URL = "https://open.tiktokapis.com/v2/oauth/token/"
 
 
+def _env_file():
+    vals = {}
+    path = os.path.join(ROOT, ".env")
+    if os.path.exists(path):
+        for line in open(path, encoding="utf-8"):
+            line = line.strip()
+            if line and not line.startswith("#") and "=" in line:
+                k, v = line.split("=", 1)
+                vals[k.strip()] = v.strip()
+    return vals
+
+
 def main():
+    env = _env_file()
     ap = argparse.ArgumentParser()
-    ap.add_argument("--client-key", required=True)
-    ap.add_argument("--client-secret", required=True)
+    ap.add_argument("--client-key", default=env.get("TIKTOK_CLIENT_KEY"))
+    ap.add_argument("--client-secret", default=env.get("TIKTOK_CLIENT_SECRET"))
     ap.add_argument("--redirect-uri", default="https://00hideo00-ship-it.github.io/yutai-auto-poster/callback.html")
     ap.add_argument("--scope", default="user.info.basic,video.upload")
     args = ap.parse_args()
+    if not args.client_key or not args.client_secret:
+        ap.error("--client-key/--client-secret are required when .env has none")
 
     q = urllib.parse.urlencode({
         "client_key": args.client_key, "scope": args.scope,
