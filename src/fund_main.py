@@ -47,7 +47,7 @@ def build_video(data, outdir):
 
 def caption_for(data):
     names = "、".join(p["short_name"] for p in data["picks"])
-    return (f"【高配当投資信託】おすすめ5選\n"
+    return (f"【{data['title_label']}】おすすめ5選\n"
             f"{names}\n"
             f"※分配金利回りは基準価額により変動します（{data['yield_basis_label']}）\n"
             f"※分配金には元本の払戻しが含まれる場合があります\n"
@@ -57,7 +57,7 @@ def caption_for(data):
 
 def publish_guide(data, caption):
     checked = max(p["checked_date"] for p in data["picks"])
-    return (f"【手動公開ガイド】高配当投資信託 おすすめ5選\n"
+    return (f"【手動公開ガイド】{data['title_label']} おすすめ5選\n"
             f"\n■ キャプション（そのままコピーして貼り付け）\n{caption}\n"
             f"\n■ 投稿設定\n"
             f"公開範囲: 全員に公開\n"
