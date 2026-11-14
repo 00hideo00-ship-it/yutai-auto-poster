@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"><title>YutaiShorts — Authorization</title></head>
+<body>
+<h1>YutaiShorts authorization</h1>
+<p id="msg">Reading authorization result…</p>
+<p style="font-size:28px; font-weight:bold; word-break:break-all;" id="code"></p>
+<p>認可コードが表示されたら、その文字列をコピーして貼り付けてください。<br>
+Copy the code above and paste it into the auth helper (src/auth.py) or send it to continue the setup.</p>
+<script>
+  var q = new URLSearchParams(location.search);
+  var code = q.get("code"), err = q.get("error_description") || q.get("error");
+  if (code) {
+    document.getElementById("msg").textContent = "Authorization succeeded. Your code:";
+    document.getElementById("code").textContent = code;
+  } else if (err) {
+    document.getElementById("msg").textContent = "Authorization failed:";
+    document.getElementById("code").textContent = err;
+  } else {
+    document.getElementById("msg").textContent = "No authorization parameters found in this URL.";
+  }
+</script>
+</body>
+</html>

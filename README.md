@@ -26,7 +26,7 @@ python3 src/main.py --post --mode draft
 1. TikTokアカウントを作る（投稿用）。
 2. [TikTok for Developers](https://developers.tiktok.com/) でアプリを作成し、製品に **Content Posting API** を追加、
    スコープ `video.upload`（directも使うなら `video.publish` も）を有効化。
-3. Login KitのリダイレクトURIに `https://localhost:8080/callback` を登録し、同梱の認可ヘルパーでトークンを取得する:
+3. Login KitのリダイレクトURIに `https://00hideo00-ship-it.github.io/yutai-auto-poster/callback.html` を登録し、同梱の認可ヘルパーでトークンを取得する:
    `python3 src/auth.py --client-key <key> --client-secret <secret>` を実行 → 表示されたURLをブラウザで開いて承認 →
    遷移先URLの `code=` の値を貼り付けると `.env` が自動で書かれる。
    アクセストークンは24時間で切れるため、本システムは毎回 refresh_token で自動更新する（更新のたびに refresh_token も新しいものに差し替わる点に注意）。

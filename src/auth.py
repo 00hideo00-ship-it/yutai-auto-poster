@@ -7,7 +7,7 @@ Prints an authorization URL, you approve it in the browser, then paste the
 
 Usage:
   python3 src/auth.py --client-key XXX --client-secret YYY \
-      --redirect-uri https://localhost:8080/callback
+      --redirect-uri https://00hideo00-ship-it.github.io/yutai-auto-poster/callback.html
 The redirect URI must exactly match the one registered in the TikTok app
 (Login Kit settings). After approval the browser may fail to load the
 localhost page - that is fine; copy the `code=...` value from the address bar.
@@ -23,7 +23,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--client-key", required=True)
     ap.add_argument("--client-secret", required=True)
-    ap.add_argument("--redirect-uri", default="https://localhost:8080/callback")
+    ap.add_argument("--redirect-uri", default="https://00hideo00-ship-it.github.io/yutai-auto-poster/callback.html")
     ap.add_argument("--scope", default="user.info.basic,video.upload")
     args = ap.parse_args()
 
