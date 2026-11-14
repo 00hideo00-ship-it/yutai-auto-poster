@@ -1,0 +1,149 @@
+{
+  "checked_date": "2026-11-15",
+  "list_subtitle": "全銘柄 利回り3.4%以上",
+  "picks": [
+    {
+      "annual_dividend_label": "272円",
+      "annual_dividend_yen": 272,
+      "checked_date": "2026-11-15",
+      "code": "2914",
+      "list_lines": [
+        "利回り 4.58%",
+        "年間配当 272円"
+      ],
+      "min_investment_label": "約59.4万円",
+      "min_investment_yen": 594400,
+      "name": "JT",
+      "point_lines": [
+        "1株配当272円に増配",
+        "配当性向75%が目安"
+      ],
+      "price_date_label": "2026年11月13日終値",
+      "price_yen": 5944,
+      "rights_label": "6月末・12月末",
+      "source_note": "配当ゴー（2026/11/13終値5,944円・予想配当利回り4.58%）。配当予想272円・推移・配当性向75%目安はLIMO記事（Yahoo!ファイナンス掲載、2026/11/6更新）でも確認",
+      "source_url": "https://haitou-go.jp/stocks/2914/",
+      "stability_note": "配当性向75%目安。年間配当は2025年12月期234円→2026年12月期予想272円に増配",
+      "summary_lines": [
+        "利回り4.58%・年間272円",
+        "100株で約59.4万円"
+      ],
+      "yield_pct": 4.58
+    },
+    {
+      "annual_dividend_label": "145円",
+      "annual_dividend_yen": 145,
+      "checked_date": "2026-11-15",
+      "code": "1928",
+      "list_lines": [
+        "利回り 4.01%",
+        "年間配当 145円"
+      ],
+      "min_investment_label": "約36.2万円",
+      "min_investment_yen": 361700,
+      "name": "積水ハウス",
+      "point_lines": [
+        "15期連続増配の見込み",
+        "配当の下限145円を設定"
+      ],
+      "price_date_label": "2026年11月13日終値",
+      "price_yen": 3617,
+      "rights_label": "1月末・7月末",
+      "source_note": "ミーナの配当利回りレポート（2026/11/13終値3,617円・予想配当利回り4.01%・年間配当145円）。15期連続増配見込みと配当下限145円はトウシル記事（2026/11/10）で確認。権利確定日は定款（期末1月31日・中間7月31日）で確認",
+      "source_url": "https://meerkatdividend.com/stocks/detail_1928",
+      "stability_note": "14期連続増配、2027年1月期は15期連続増配見込み。中期経営計画で配当の下限145円を設定",
+      "summary_lines": [
+        "利回り4.01%・年間145円",
+        "100株で約36.2万円"
+      ],
+      "yield_pct": 4.01
+    },
+    {
+      "annual_dividend_label": "51円",
+      "annual_dividend_yen": 51,
+      "checked_date": "2026-11-15",
+      "code": "8593",
+      "list_lines": [
+        "利回り 3.78%",
+        "年間配当 51円"
+      ],
+      "min_investment_label": "約13.5万円",
+      "min_investment_yen": 134850,
+      "name": "三菱HCキャピタル",
+      "point_lines": [
+        "28期連続増配の見込み",
+        "約13.5万円から買える"
+      ],
+      "price_date_label": "2026年11月12日時点",
+      "price_yen": 1348.5,
+      "rights_label": "3月末・9月末",
+      "source_note": "銘柄分析スコアシート（2026/11/12株価1,348.5円・予想配当利回り3.78%・年間配当51円、出典IR BANK/Yahoo!ファイナンス）。28期連続増配見込みはライジングブル記事でも確認",
+      "source_url": "https://tjfreelife.com/analysis-scoresheet-8593/",
+      "stability_note": "2026年3月期まで27期連続増配、2027年3月期予想51円で28期連続増配見込み",
+      "summary_lines": [
+        "利回り3.78%・年間51円",
+        "100株で約13.5万円"
+      ],
+      "yield_pct": 3.78
+    },
+    {
+      "annual_dividend_label": "8.8円",
+      "annual_dividend_yen": 8.8,
+      "checked_date": "2026-11-15",
+      "code": "9434",
+      "list_lines": [
+        "利回り 3.67%",
+        "年間配当 8.8円"
+      ],
+      "min_investment_label": "約2.4万円",
+      "min_investment_yen": 24010,
+      "name": "ソフトバンク",
+      "point_lines": [
+        "配当8.6円を6期維持",
+        "今期は8.8円に増配予想"
+      ],
+      "price_date_label": "2026年11月13日終値",
+      "price_yen": 240.1,
+      "rights_label": "3月末・9月末",
+      "source_note": "マネックス証券 銘柄スカウターライト（2026/11/13現在値240.1円・予想配当利回り3.67%・2027/03予想1株配当8.80円）。8.6円の6期据え置きはコアラ先生の高配当株ブログ（IRBANK出典）で確認",
+      "source_url": "https://scouter.monex.co.jp/report/dps/9434",
+      "stability_note": "年間配当8.6円を2021年3月期から6期据え置き（減配なし）、2027年3月期は8.8円へ増配予想",
+      "summary_lines": [
+        "利回り3.67%・年間8.8円",
+        "100株で約2.4万円"
+      ],
+      "yield_pct": 3.67
+    },
+    {
+      "annual_dividend_label": "180円",
+      "annual_dividend_yen": 180,
+      "checked_date": "2026-11-15",
+      "code": "2768",
+      "list_lines": [
+        "利回り 3.41%",
+        "年間配当 180円"
+      ],
+      "min_investment_label": "約52.8万円",
+      "min_investment_yen": 528000,
+      "name": "双日",
+      "point_lines": [
+        "累進配当の方針を明記",
+        "配当180円へ増配予想"
+      ],
+      "price_date_label": "2026年11月13日終値",
+      "price_yen": 5280,
+      "rights_label": "3月末・9月末",
+      "source_note": "配当ゴー（2026/11/13終値ベース予想配当利回り3.41%・DOE4.5%を基本とする累進配当方針）。11/13終値5,280円は株武将、年間配当180円（中間90円+期末90円）はみんかぶ配当情報でも確認",
+      "source_url": "https://haitou-go.jp/stocks/2768/",
+      "stability_note": "中期経営計画で株主資本DOE4.5%を基本とする累進配当方針。年間配当は165円→180円へ増配予想",
+      "summary_lines": [
+        "利回り3.41%・年間180円",
+        "100株で約52.8万円"
+      ],
+      "yield_pct": 3.41
+    }
+  ],
+  "points_subtitle": "増配・安定配当の実績で選出",
+  "title_label": "高配当株",
+  "yield_basis_label": "2026年11月13日終値ベース（三菱HCキャピタルは11月12日時点）"
+}
