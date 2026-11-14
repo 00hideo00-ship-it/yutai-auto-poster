@@ -82,9 +82,11 @@ def fetch_status(token, publish_id):
 def post_video(token, file_path, title, mode="draft", privacy_level="SELF_ONLY",
                poll_seconds=120):
     size = os.path.getsize(file_path)
-    info = creator_info(token)
-    creator = info.get("data", {})
     if mode == "direct":
+        # creator_info requires the video.publish scope; the draft (inbox)
+        # flow with only video.upload must not call it (scope_not_authorized).
+        info = creator_info(token)
+        creator = info.get("data", {})
         max_dur = creator.get("max_video_post_duration_sec", 180)
         if 30 > max_dur:
             raise RuntimeError(f"creator max duration {max_dur}s < 30s")
