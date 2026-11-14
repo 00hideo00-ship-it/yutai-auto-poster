@@ -7,8 +7,25 @@ from PIL import Image, ImageDraw, ImageFont
 import os, random
 
 W, H = 720, 1280
-BOLD = "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc"
-REG = "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc"
+def _pick(cands):
+    for c in cands:
+        if os.path.exists(c):
+            return c
+    return cands[0]
+
+_WIN = os.path.join(os.environ.get("WINDIR", "C:\\Windows"), "Fonts")
+BOLD = _pick([
+    "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",
+    os.path.join(_WIN, "YuGothB.ttc"),
+    os.path.join(_WIN, "meiryob.ttc"),
+    os.path.join(_WIN, "msgothic.ttc"),
+])
+REG = _pick([
+    "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+    os.path.join(_WIN, "YuGothR.ttc"),
+    os.path.join(_WIN, "meiryo.ttc"),
+    os.path.join(_WIN, "msgothic.ttc"),
+])
 COLORS = [(249, 168, 212), (252, 165, 165), (196, 181, 253), (134, 239, 172), (94, 234, 212)]
 
 def F(p, s):
