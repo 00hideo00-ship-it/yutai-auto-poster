@@ -1,0 +1,43 @@
+name: weekly-yutai-video
+
+# Every Monday 10:00 JST: generate the next yutai 5-picks video and,
+# if TikTok secrets are set, send it to TikTok. Without secrets it only
+# builds the video and saves it as a workflow artifact.
+on:
+  schedule:
+    - cron: "0 1 * * 1"   # Mon 01:00 UTC = 10:00 JST
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "draft = TikTok inbox / direct = publish"
+        default: "draft"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install deps (Pillow + Noto CJK + ffmpeg)
+        run: |
+          pip install -r requirements.txt
+          sudo apt-get update && sudo apt-get install -y ffmpeg fonts-noto-cjk
+      - name: Generate video (fact-check gate runs first)
+        env:
+          TIKTOK_CLIENT_KEY: ${{ secrets.TIKTOK_CLIENT_KEY }}
+          TIKTOK_CLIENT_SECRET: ${{ secrets.TIKTOK_CLIENT_SECRET }}
+          TIKTOK_REFRESH_TOKEN: ${{ secrets.TIKTOK_REFRESH_TOKEN }}
+        run: |
+          if [ -n "$TIKTOK_CLIENT_KEY" ]; then
+            python3 src/main.py --post --mode "${{ inputs.mode || 'draft' }}"
+          else
+            echo "TikTok secrets not set: generating package only"
+            python3 src/main.py
+          fi
+      - name: Save video + probe frames as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: yutai-video
+          path: output/
