@@ -11,26 +11,36 @@ Modes:
 Tokens: access_token expires in 24h, so we refresh with the refresh_token
 on every run (client_key/client_secret/refresh_token from env or .env).
 """
-import json, os, time, urllib.parse, urllib.request
+import json, os, time, urllib.error, urllib.parse, urllib.request
 
 BASE = "https://open.tiktokapis.com/v2"
 
 def _post_json(url, token, payload):
     req = urllib.request.Request(
         url, data=json.dumps(payload).encode(),
-        headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json; charset=UTF-8"},
+        headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json; charset=UTF-8",
+                 "User-Agent": "yutai-auto-poster/1.0"},
         method="POST")
-    with urllib.request.urlopen(req, timeout=60) as r:
-        return json.loads(r.read().decode())
+    try:
+        with urllib.request.urlopen(req, timeout=60) as r:
+            return json.loads(r.read().decode())
+    except urllib.error.HTTPError as e:
+        body = e.read().decode(errors="replace")
+        raise RuntimeError(f"HTTP {e.code} from {url}: {body}") from None
 
 def refresh_access_token(client_key, client_secret, refresh_token):
     body = urllib.parse.urlencode({
         "client_key": client_key, "client_secret": client_secret,
         "grant_type": "refresh_token", "refresh_token": refresh_token}).encode()
     req = urllib.request.Request(f"{BASE}/oauth/token/", data=body,
-                                 headers={"Content-Type": "application/x-www-form-urlencoded"})
-    with urllib.request.urlopen(req, timeout=60) as r:
-        data = json.loads(r.read().decode())
+                                 headers={"Content-Type": "application/x-www-form-urlencoded",
+                                          "User-Agent": "yutai-auto-poster/1.0"})
+    try:
+        with urllib.request.urlopen(req, timeout=60) as r:
+            data = json.loads(r.read().decode())
+    except urllib.error.HTTPError as e:
+        body = e.read().decode(errors="replace")
+        raise RuntimeError(f"HTTP {e.code} from token endpoint: {body}") from None
     if "access_token" not in data:
         raise RuntimeError(f"token refresh failed: {data}")
     return data  # contains access_token and a NEW refresh_token (rotate it!)
