@@ -66,6 +66,22 @@ def caption_for(data):
             f"#株主優待 #優待株 #{data['month_label']}優待 #日本株 #投資初心者")
 
 
+def publish_guide(data, caption):
+    checked = max(p["checked_date"] for p in data["picks"])
+    return (f"【手動公開ガイド】{data['month_label']}株主優待 おすすめ5選\n"
+            f"\n■ キャプション（そのままコピーして貼り付け）\n{caption}\n"
+            f"\n■ 投稿設定\n"
+            f"公開範囲: 全員に公開\n"
+            f"カバー: 動画の先頭フレーム（一覧カード）を選択\n"
+            f"コメント: 許可する\n"
+            f"Duet / Stitch: 許可する（拡散用）\n"
+            f"AI生成コンテンツのラベル: オン（自動生成した動画のため）\n"
+            f"音楽: 動画内のオリジナルBGMのまま（TikTok側の曲は追加しない）\n"
+            f"\n■ 投稿前チェック\n"
+            f"ファクトチェック済み（{checked}時点）\n"
+            f"権利付き最終日: {data['rights_last_day_label']}\n")
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--month", help="YYYY-MM; default: newest picks file")
@@ -138,6 +154,10 @@ def main():
     with open(os.path.join(outdir, "post_package.json"), "w", encoding="utf-8") as f:
         json.dump(package, f, ensure_ascii=False, indent=2)
     print(f"package: {os.path.join(outdir, 'post_package.json')}")
+    guide_path = os.path.join(outdir, "publish_guide.txt")
+    with open(guide_path, "w", encoding="utf-8") as f:
+        f.write(publish_guide(data, caption))
+    print(f"publish guide: {guide_path}")
     return 0
 
 
