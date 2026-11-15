@@ -85,7 +85,9 @@ def detail_card(data, idx, out):
         d.rounded_rectangle([36, y, 684, y + 128], radius=22, fill=(255, 255, 255, 255),
                             outline=TEAL + (255,), width=3)
         d.ellipse([58, y + 44, 98, y + 84], fill=AMBER)
-        size = 31 if len(ln) <= 21 else 28
+        size = 31
+        while size > 22 and d.textlength(ln, font=F(BOLD, size)) > 556:
+            size -= 3
         d.text((118, y + 64), ln, font=F(BOLD, size), fill=BODY, anchor="lm")
         y += 148
     _footer(d, FOOTER_DETAIL)
