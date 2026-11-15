@@ -3,7 +3,19 @@
 No copyrighted material: every sound is generated here."""
 import math, random, struct, wave, os
 
-def make_bgm(path, dur=30.0, sr=44100):
+def make_bgm(path, dur=30.0, sr=44100, bpm=128, chords=None, melody=None):
+    """Original synthesized pop BGM.
+
+    Default: C major I-V-vi-IV at 128 BPM (the original yutai theme).
+    Themes can pass their own bpm / chords / melody, e.g. the calendar
+    theme uses G major at ~112 BPM. Chords are (bass_freq, [note freqs]).
+    """
+    chords = chords or [(130.81, [261.63, 329.63, 392.00, 523.25]),
+                        (98.00, [246.94, 293.66, 392.00, 493.88]),
+                        (110.00, [261.63, 329.63, 440.00, 523.25]),
+                        (87.31, [220.00, 349.23, 440.00, 523.25])]
+    melody = melody or [523.25, 587.33, 659.25, 783.99, 659.25, 587.33, 523.25, 440.00,
+                        493.88, 523.25, 587.33, 659.25, 587.33, 523.25, 493.88, 440.00]
     n = int(sr * dur)
     mono = [0.0] * n
 
@@ -28,13 +40,8 @@ def make_bgm(path, dur=30.0, sr=44100):
     def hat(t, d): return (rng.random() * 2 - 1) * math.exp(-55 * t)
     def clap(t, d): return (rng.random() * 2 - 1) * math.exp(-18 * t)
 
-    beat = 60.0 / 128; bar = beat * 4
-    chords = [(130.81, [261.63, 329.63, 392.00, 523.25]),
-              (98.00, [246.94, 293.66, 392.00, 493.88]),
-              (110.00, [261.63, 329.63, 440.00, 523.25]),
-              (87.31, [220.00, 349.23, 440.00, 523.25])]
-    melody = [523.25, 587.33, 659.25, 783.99, 659.25, 587.33, 523.25, 440.00,
-              493.88, 523.25, 587.33, 659.25, 587.33, 523.25, 493.88, 440.00]
+    beat = 60.0 / bpm; bar = beat * 4
+    melody = melody
     b = 0
     while b * bar < dur:
         t0 = b * bar
@@ -61,3 +68,15 @@ def make_bgm(path, dur=30.0, sr=44100):
         w.setnchannels(2); w.setsampwidth(2); w.setframerate(sr)
         w.writeframes(bytes(frames))
     return path
+
+
+# Theme presets: (bpm, chords, melody). Calendar theme: G major, ~112 BPM.
+CALENDAR_THEME = {
+    "bpm": 112,
+    "chords": [(98.00, [196.00, 246.94, 293.66, 392.00]),   # G
+               (73.42, [146.83, 220.00, 293.66, 369.99]),   # D
+               (82.41, [164.81, 196.00, 246.94, 329.63]),   # Em
+               (65.41, [130.81, 196.00, 261.63, 329.63])],  # C
+    "melody": [392.00, 440.00, 493.88, 587.33, 493.88, 440.00, 392.00, 329.63,
+               369.99, 392.00, 440.00, 493.88, 440.00, 392.00, 369.99, 329.63],
+}

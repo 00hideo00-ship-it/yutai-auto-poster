@@ -37,6 +37,18 @@ python3 src/main.py --post --mode draft
 Secretsが無ければ動画生成のみ行い、成果物をArtifactsに保存する（投稿はされない）。
 新しい対象月を出すときは、その月の `data/picks_YYYY-MM.json` を出典付きで追加する。
 
+## 週次カレンダー動画「今週の権利確定日カレンダー」（月曜20:00投稿分）
+- **パイプライン**: `data/calendar_YYYY-MM-DD.json`（対象週の月曜日の日付）→
+  `src/calendar_factcheck.py`（ゲート：週内に権利日がある1〜5銘柄、来週の予告、価格×100=最低投資額）→
+  `src/calendar_cards.py`（オレンジ×クリーム、「今週」バッジ）→
+  `src/music.py` の `CALENDAR_THEME`（Gメジャー、約112BPM）→ 61秒動画
+- **構成（61秒）**: タイトル 6秒 → 銘柄カード 各11秒 → 来週の予告 11秒 → まとめ 11秒
+- **実行**: `python3 src/calendar_main.py --file data/calendar_2026-11-16.json`
+- **成果物**: `output/calendar-<週>/video.mp4` + `publish_guide.txt` + `probe/`、
+  ファクトチェックシートは `~/workspace/yutai-shorts/<週>_calendar/factcheck.md`
+- 対象週に該当銘柄が少ない週は、翌週分の主なものを「来週の予告」として明示して含める。
+  予告銘柄の株価は動画内に表示せず、翌週の動画で最新終値ベースに更新する。
+
 ## 注意
 - TikTokの仕様上、未審査アプリからの direct 投稿は非公開になる。まず draft で運用し、続けるなら審査申請を検討する。
 - 動画内の数値・条件は picks データの確認日時点のもの。権利月が近づいたら再確認する。
