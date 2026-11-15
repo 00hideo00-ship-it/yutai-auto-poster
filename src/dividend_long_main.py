@@ -22,7 +22,7 @@ TOTAL = sum(SEGMENTS)
 
 def build_video(data, outdir):
     card_paths = dividend_cards.build_long_all(data, os.path.join(outdir, "cards_long"))
-    bgm = music.make_bgm(os.path.join(outdir, "bgm_long.wav"), dur=float(TOTAL))
+    bgm = music.make_bgm(os.path.join(outdir, "bgm_long.wav"), dur=float(TOTAL), **music.DIVIDEND_THEME)
     video = os.path.join(outdir, "video_long.mp4")
     inputs = "".join(f"[{i}:v]fps=30,format=yuv420p[v{i}];" for i in range(len(card_paths)))
     concat = "".join(f"[v{i}]" for i in range(len(card_paths)))

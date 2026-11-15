@@ -29,7 +29,7 @@ def load_env():
 
 def build_video(data, outdir):
     card_paths = cards.build_all(data, os.path.join(outdir, "cards"))
-    bgm = music.make_bgm(os.path.join(outdir, "bgm.wav"), dur=30.0)
+    bgm = music.make_bgm(os.path.join(outdir, "bgm.wav"), dur=30.0, **music.YUTAI_THEME)
     video = os.path.join(outdir, "video.mp4")
     fc = ("[0:v]fps=30,format=yuv420p[v0];[1:v]fps=30,format=yuv420p[v1];"
           "[2:v]fps=30,format=yuv420p[v2];[v0][v1][v2]concat=n=3:v=1:a=0[v];"
