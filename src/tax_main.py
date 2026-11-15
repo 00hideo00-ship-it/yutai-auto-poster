@@ -69,12 +69,12 @@ def tiktok_caption(data):
             f"年末調整でできるものと、確定申告が必要なものがあります\n"
             f"※2026年11月時点の制度です。税制は変更される場合があります\n"
             f"※本動画は一般的な制度紹介です。個別の税務相談は税理士にご相談ください\n"
-            f"#節税 #サラリーマン #ふるさと納税 #iDeCo #NISA #年末調整 #確定申告")
+            f"#節税 #サラリーマン #ふるさと納税 #確定拠出年金 #iDeCo #企業型DC #NISA #年末調整 #確定申告")
 
 
 def youtube_texts(data):
     title = ("【節税対策5選】サラリーマンができる税金の控除まとめ"
-             "｜ふるさと納税・iDeCo・NISA・住宅ローン控除・医療費控除")
+             "｜ふるさと納税・確定拠出年金・NISA・住宅ローン控除・医療費控除")
     lines = ["サラリーマンが使える節税対策を5つ紹介します。", ""]
     for p in data["picks"]:
         lines.append(f"■ {p['name']}")
@@ -88,7 +88,7 @@ def youtube_texts(data):
         f"▼お役立ちリンク集（SNSまとめ）\n{LANDING}\n"
         "▼TikTok\nhttps://www.tiktok.com/@toushi_daisuki\n"
         "▼Instagram\nhttps://www.instagram.com/toushi_daisuki_\n\n"
-        "#節税 #サラリーマン #ふるさと納税 #iDeCo #NISA #住宅ローン控除 #医療費控除 #Shorts")
+        "#節税 #サラリーマン #ふるさと納税 #確定拠出年金 #iDeCo #NISA #住宅ローン控除 #医療費控除 #Shorts")
     return title, desc
 
 
