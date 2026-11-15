@@ -14,7 +14,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "src"))
 import tax_factcheck, tax_cards, music  # noqa: E402
 
-SEGMENTS = [10, 8, 8, 8, 8, 8, 11]  # list, 5 detail cards, summary = 61s
+SEGMENTS = [4, 6, 8, 8, 8, 8, 8, 11]  # title, list, 5 detail cards, summary = 61s
 TOTAL = sum(SEGMENTS)
 
 TAX_THEME = {
@@ -55,7 +55,7 @@ def build_video(data, outdir):
         raise RuntimeError(f"video duration {dur}s is not in 61-63s")
     probe = os.path.join(outdir, "probe")
     os.makedirs(probe, exist_ok=True)
-    for t in (5, 14, 22, 30, 38, 46, 56):
+    for t in (2, 7, 14, 22, 30, 38, 46, 56):
         subprocess.run(["ffmpeg", "-nostdin", "-y", "-v", "error", "-ss", str(t),
                         "-i", video, "-frames:v", "1", "-q:v", "4",
                         os.path.join(probe, f"frame_{t}s.jpg")], check=True)
@@ -111,7 +111,7 @@ def publish_guide(data):
             f"キャプション（そのままコピーして貼り付け）\n{tiktok_caption(data)}\n"
             f"\n投稿設定\n"
             f"公開範囲: 全員に公開\n"
-            f"カバー: 動画の先頭フレーム（一覧カード）を選択\n"
+            f"カバー: 動画の先頭フレーム（タイトルカード）を選択\n"
             f"コメント: 許可する\n"
             f"Duet / Stitch: 許可する（拡散用）\n"
             f"AI生成コンテンツのラベル: オン（自動生成した動画のため）\n"

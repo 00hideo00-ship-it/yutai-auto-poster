@@ -60,27 +60,17 @@ def _footer(d, text="※投資推奨ではありません・優待は変更さ�
     d.text((W // 2, H - 42), text, font=F(REG, 21), fill=GRAY, anchor="mm")
 
 def title_card(data, out):
+    """Opening title card: title block centered on screen (Hide's rule,
+    2026-11-15) so the topic is clear at a glance."""
     img, d = _cream_base()
     _badge(d)
-    d.text((W // 2, 150), "今週の", font=F(BOLD, 52), fill=ORANGE_DARK, anchor="mm")
-    d.text((W // 2, 250), "権利確定日", font=F(BOLD, 78), fill=(234, 88, 12), anchor="mm",
-           stroke_width=8, stroke_fill=(255, 255, 255))
-    d.text((W // 2, 340), "カレンダー", font=F(BOLD, 78), fill=(234, 88, 12), anchor="mm",
-           stroke_width=8, stroke_fill=(255, 255, 255))
-    d.rounded_rectangle([60, 430, 660, 500], radius=30, fill=(255, 255, 255))
-    d.text((W // 2, 465), data["week_label"], font=F(BOLD, 33), fill=INK, anchor="mm")
-    # this week's key date
-    d.rounded_rectangle([48, 560, 672, 760], radius=26, fill=ORANGE)
-    d.text((W // 2, 612), "今週の山場", font=F(BOLD, 34), fill=(255, 255, 255), anchor="mm")
-    d.text((W // 2, 678), f"{data['picks'][0]['rights_label']}  {len(data['picks'])}銘柄",
-           font=F(BOLD, 44), fill=(255, 255, 255), anchor="mm")
-    # next-week teaser
-    d.rounded_rectangle([48, 800, 672, 960], radius=26, fill=(255, 255, 255))
-    d.text((W // 2, 852), "来週の予告", font=F(BOLD, 34), fill=ORANGE_DARK, anchor="mm")
-    d.text((W // 2, 912), f"{data['next_week']['rights_label']} 月末組が本番",
-           font=F(BOLD, 36), fill=INK, anchor="mm")
-    d.text((W // 2, 1050), "権利付き最終日までに買えば", font=F(BOLD, 32), fill=GRAY, anchor="mm")
-    d.text((W // 2, 1100), "優待・配当の権利がもらえます", font=F(BOLD, 32), fill=GRAY, anchor="mm")
+    d.rounded_rectangle([36, 400, 684, 920], radius=36, fill=(255, 255, 255))
+    d.text((W // 2, 500), "今週の", font=F(BOLD, 46), fill=ORANGE_DARK, anchor="mm")
+    d.text((W // 2, 612), "権利確定日", font=F(BOLD, 84), fill=(234, 88, 12), anchor="mm")
+    d.text((W // 2, 724), "カレンダー", font=F(BOLD, 84), fill=(234, 88, 12), anchor="mm")
+    d.rounded_rectangle([60, 806, 660, 880], radius=37, fill=ORANGE)
+    d.text((W // 2, 843), data["week_label"], font=F(BOLD, 29),
+           fill=(255, 255, 255), anchor="mm")
     _footer(d)
     img.save(out); return out
 

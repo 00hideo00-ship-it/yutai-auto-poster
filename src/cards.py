@@ -108,7 +108,32 @@ def summary_card(data, out):
 def build_all(data, outdir):
     os.makedirs(outdir, exist_ok=True)
     return [
+        title_card(data, os.path.join(outdir, "card_title.png")),
         list_card(data, os.path.join(outdir, "card_list.png")),
         points_card(data, os.path.join(outdir, "card_points.png")),
         summary_card(data, os.path.join(outdir, "card_summary.png")),
     ]
+
+
+
+
+def title_card(data, out):
+    """Opening title card (Hide's rule, 2026-11-15): the video title is
+    centered on screen so viewers know the topic immediately."""
+    img = Image.new("RGB", (W, H), (29, 140, 248))
+    d = ImageDraw.Draw(img, "RGBA")
+    random.seed(3)
+    for _ in range(28):
+        x, y = random.randint(-40, W), random.randint(-40, H)
+        r = random.randint(8, 42)
+        d.ellipse([x - r, y - r, x + r, y + r], fill=(255, 255, 255, 26))
+    d.rounded_rectangle([36, 400, 684, 880], radius=36, fill=(255, 255, 255))
+    d.text((W // 2, 552), f"{data['month_label']}の株主優待", font=F(BOLD, 72),
+           fill=(239, 68, 68), anchor="mm")
+    d.text((W // 2, 672), "5選", font=F(BOLD, 88), fill=(239, 68, 68), anchor="mm")
+    d.rounded_rectangle([120, 756, 600, 830], radius=37, fill=(30, 64, 175))
+    d.text((W // 2, 793), f"権利付き最終日 {data['rights_last_day_label']}",
+           font=F(BOLD, 28), fill=(255, 255, 255), anchor="mm")
+    _footer(d)
+    img.save(out); return out
+

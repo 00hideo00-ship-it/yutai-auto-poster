@@ -13,16 +13,17 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "src"))
 import fund_factcheck, fund_cards, music  # noqa: E402
 
-SEGMENTS = [11, 10, 9]  # list, points, summary = 30s total
+SEGMENTS = [3, 9, 9, 9]  # title, list, points, summary = 30s total
 
 
 def build_video(data, outdir):
     card_paths = fund_cards.build_all(data, os.path.join(outdir, "cards"))
     bgm = music.make_bgm(os.path.join(outdir, "bgm.wav"), dur=30.0, **music.FUND_THEME)
     video = os.path.join(outdir, "video.mp4")
-    fc = ("[0:v]fps=30,format=yuv420p[v0];[1:v]fps=30,format=yuv420p[v1];"
-          "[2:v]fps=30,format=yuv420p[v2];[v0][v1][v2]concat=n=3:v=1:a=0[v];"
-          "[3:a]atrim=0:30,afade=t=out:st=28:d=2,"
+    inputs = "".join(f"[{i}:v]fps=30,format=yuv420p[v{i}];" for i in range(len(card_paths)))
+    concat = "".join(f"[v{i}]" for i in range(len(card_paths)))
+    fc = (f"{inputs}{concat}concat=n={len(card_paths)}:v=1:a=0[v];"
+          f"[{len(card_paths)}:a]atrim=0:30,afade=t=out:st=28:d=2,"
           "aformat=sample_rates=44100:channel_layouts=stereo[a]")
     cmd = ["ffmpeg", "-nostdin", "-y", "-v", "error"]
     for path, dur in zip(card_paths, SEGMENTS):
@@ -38,7 +39,7 @@ def build_video(data, outdir):
         raise RuntimeError(f"video duration {dur}s is not 30s")
     probe = os.path.join(outdir, "probe")
     os.makedirs(probe, exist_ok=True)
-    for t in (5, 16, 26):
+    for t in (1, 7, 16, 25):
         subprocess.run(["ffmpeg", "-nostdin", "-y", "-v", "error", "-ss", str(t),
                         "-i", video, "-frames:v", "1", "-q:v", "4",
                         os.path.join(probe, f"frame_{t}s.jpg")], check=True)
@@ -61,7 +62,7 @@ def publish_guide(data, caption):
             f"\n■ キャプション（そのままコピーして貼り付け）\n{caption}\n"
             f"\n■ 投稿設定\n"
             f"公開範囲: 全員に公開\n"
-            f"カバー: 動画の先頭フレーム（一覧カード）を選択\n"
+            f"カバー: 動画の先頭フレーム（タイトルカード）を選択\n"
             f"コメント: 許可する\n"
             f"Duet / Stitch: 許可する（拡散用）\n"
             f"AI生成コンテンツのラベル: オン（自動生成した動画のため）\n"

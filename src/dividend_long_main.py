@@ -16,7 +16,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "src"))
 import dividend_factcheck, dividend_cards, dividend_main, music  # noqa: E402
 
-SEGMENTS = [8, 10, 10, 10, 10, 10, 10]  # list, 5 detail cards, summary = 68s
+SEGMENTS = [4, 7, 8, 8, 8, 8, 8, 10]  # title, list, 5 detail cards, summary = 61s
 TOTAL = sum(SEGMENTS)
 
 
@@ -43,8 +43,8 @@ def build_video(data, outdir):
         raise RuntimeError(f"video duration {dur}s is not {TOTAL}s")
     probe = os.path.join(outdir, "probe_long")
     os.makedirs(probe, exist_ok=True)
-    # list 4s, detail cards 13/23/33/43/53s, summary 63s
-    for t in (4, 13, 23, 33, 43, 53, 63):
+    # title 2s, list 7s, detail cards 15/23/31/39/47s, summary 56s
+    for t in (2, 7, 15, 23, 31, 39, 47, 56):
         subprocess.run(["ffmpeg", "-nostdin", "-y", "-v", "error", "-ss", str(t),
                         "-i", video, "-frames:v", "1", "-q:v", "4",
                         os.path.join(probe, f"frame_{t}s.jpg")], check=True)

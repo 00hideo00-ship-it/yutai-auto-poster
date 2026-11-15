@@ -128,7 +128,39 @@ def summary_card(data, out):
 def build_all(data, outdir):
     os.makedirs(outdir, exist_ok=True)
     return [
+        title_card(data, os.path.join(outdir, "card_title.png")),
         list_card(data, os.path.join(outdir, "card_list.png")),
         points_card(data, os.path.join(outdir, "card_points.png")),
         summary_card(data, os.path.join(outdir, "card_summary.png")),
     ]
+
+
+
+
+def title_card(data, out):
+    """Opening title card (Hide's rule, 2026-11-15): the video title is
+    centered on screen so viewers know the topic immediately."""
+    img = Image.new("RGB", (W, H), BG)
+    d = ImageDraw.Draw(img, "RGBA")
+    random.seed(3)
+    for _ in range(28):
+        x, y = random.randint(-40, W), random.randint(-40, H)
+        r = random.randint(8, 42)
+        c = random.choice([(38, 49, 107, 20), (232, 168, 18, 24), (90, 110, 180, 24)])
+        d.ellipse([x - r, y - r, x + r, y + r], fill=c)
+    for _ in range(8):
+        x, y = random.randint(20, W - 20), random.randint(220, H - 60)
+        r = random.randint(9, 17)
+        d.ellipse([x - r, y - r, x + r, y + r], outline=(232, 168, 18, 110), width=3)
+    d.rounded_rectangle([36, 400, 684, 880], radius=36, fill=INDIGO + (255,))
+    _badge(d, 646, 76, 37)
+    d.text((W // 2, 552), data["title_label"], font=F(BOLD, 76), fill=GOLD_LIGHT,
+           anchor="mm", stroke_width=6, stroke_fill=INDIGO_DARK)
+    d.text((W // 2, 672), "5選", font=F(BOLD, 88), fill=GOLD_LIGHT,
+           anchor="mm", stroke_width=6, stroke_fill=INDIGO_DARK)
+    d.rounded_rectangle([120, 756, 600, 830], radius=37, fill=GOLD + (255,))
+    d.text((W // 2, 793), data["list_subtitle"], font=F(BOLD, 28),
+           fill=INDIGO_DARK, anchor="mm")
+    d.text((W // 2, H - 42), FOOTER_POINTS, font=F(REG, 20), fill=INDIGO_DARK, anchor="mm")
+    img.save(out); return out
+
