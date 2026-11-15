@@ -66,6 +66,8 @@ def publish_guide(data, caption):
             f"Duet / Stitch: 許可する（拡散用）\n"
             f"AI生成コンテンツのラベル: オン（自動生成した動画のため）\n"
             f"音楽: 動画内のオリジナルBGMのまま（TikTok側の曲は追加しない）\n"
+            f"\n■ YouTube Shorts / Instagramリール\n"
+            f"同じファイルを YouTube Shorts / Instagramリールにもそのまま投稿できます（30秒版・1分超版どちらも可）\n"
             f"\n■ 投稿前チェック\n"
             f"ファクトチェック済み（{checked}時点）\n"
             f"配当利回りの基準: {data['yield_basis_label']}\n")

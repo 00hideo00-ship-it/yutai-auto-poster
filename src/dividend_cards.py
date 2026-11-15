@@ -36,7 +36,7 @@ def _coin(d, cx, cy, r):
     d.text((cx, cy - 2), "¥", font=F(BOLD, int(r * 1.15)), fill=COIN_TEXT, anchor="mm")
 
 
-def _base(title, subtitle):
+def _base(title, subtitle, title_size=58):
     img = Image.new("RGB", (W, H), CREAM)
     d = ImageDraw.Draw(img, "RGBA")
     random.seed(3)
@@ -51,13 +51,39 @@ def _base(title, subtitle):
         d.ellipse([x - r, y - r, x + r, y + r], outline=(232, 168, 18, 110), width=3)
     # deep-green header band holding title + subtitle
     d.rounded_rectangle([16, 16, 704, 196], radius=28, fill=GREEN + (255,))
-    d.text((W // 2, 78), title, font=F(BOLD, 58), fill=GOLD_LIGHT, anchor="mm",
+    d.text((W // 2, 78), title, font=F(BOLD, title_size), fill=GOLD_LIGHT, anchor="mm",
            stroke_width=6, stroke_fill=GREEN_DARK)
     sub_size = 34 if len(subtitle) <= 15 else (26 if len(subtitle) <= 24 else 22)
     d.rounded_rectangle([40, 118, 680, 178], radius=30, fill=GOLD + (255,))
     d.text((W // 2, 148), subtitle, font=F(BOLD, sub_size), fill=GREEN_DARK, anchor="mm")
     _coin(d, 646, 76, 37)  # series marker
     return img, d
+
+
+def _wrap(d, text, font, max_w):
+    """Wrap text by measured pixel width (CJK-aware: no mid-word breaks needed)."""
+    lines, cur = [], ""
+    for ch in text:
+        if d.textlength(cur + ch, font=font) <= max_w:
+            cur += ch
+        else:
+            lines.append(cur)
+            cur = ch
+    if cur:
+        lines.append(cur)
+    return lines
+
+
+def _info_box(d, y, h, color, heading, lines):
+    """One rounded info box. lines: list of (text, size, color)."""
+    d.rounded_rectangle([28, y, 692, y + h], radius=26, fill=color + (255,),
+                        outline=GREEN + (255,), width=3)
+    d.text((52, y + 14), heading, font=F(BOLD, 28), fill=GREEN_DARK)
+    yy = y + 58
+    for text, size, col in lines:
+        d.text((52, yy), text, font=F(BOLD, size), fill=col)
+        yy += size + 14
+    return y + h
 
 
 def _rows(d, picks, lines_key, y0=205):
@@ -129,3 +155,49 @@ def build_all(data, outdir):
         points_card(data, os.path.join(outdir, "card_points.png")),
         summary_card(data, os.path.join(outdir, "card_summary.png")),
     ]
+
+
+def detail_card(pick, idx, out):
+    """One per-pick detail card for the 60s+ long version: yield, annual
+    dividend, min investment, rights months, stability record and policy.
+    Title uses a smaller font so long names (e.g. 三菱HCキャピタル) clear
+    the ¥ coin badge in the header."""
+    img, d = _base(f"{pick['name']} ({pick['code']})",
+                   f"利回り {pick['yield_pct']}% ・ 年間配当 {pick['annual_dividend_label']}",
+                   title_size=40)
+    y = 212
+    c = ROW_COLORS[idx % len(ROW_COLORS)]
+    # 1) 最低投資額
+    y = _info_box(d, y, 168, c, "最低投資額（100株）", [
+        (f"{pick['min_investment_label']}", 40, NAME),
+        (f"株価 {pick['price_yen']:,}円（{pick['price_date_label']}）", 26, BODY),
+    ]) + 16
+    # 2) 権利確定月
+    y = _info_box(d, y, 168, ROW_COLORS[(idx + 1) % len(ROW_COLORS)], "権利確定月", [
+        (f"{pick['rights_label']}", 40, NAME),
+        ("年2回の配当", 26, BODY),
+    ]) + 16
+    # 3) 増配・安定の実績（stability_note を折り返し表示）
+    note_lines = _wrap(d, pick["stability_note"], F(BOLD, 30), 600)
+    y = _info_box(d, y, 210, ROW_COLORS[(idx + 2) % len(ROW_COLORS)], "増配・安定の実績",
+                  [(ln, 30, BODY) for ln in note_lines[:3]]) + 16
+    # 4) 注目ポイント
+    y = _info_box(d, y, 168, ROW_COLORS[(idx + 3) % len(ROW_COLORS)], "注目ポイント",
+                  [(ln, 30, BODY) for ln in pick["point_lines"]]) + 16
+    # 5) 利回りの根拠（年間配当 ÷ 株価）
+    y = _info_box(d, y, 150, ROW_COLORS[(idx + 4) % len(ROW_COLORS)], "利回りの根拠", [
+        (f"年間配当 {pick['annual_dividend_label']} ÷ 株価 {pick['price_yen']:,}円", 30, NAME),
+        (f"＝ {pick['yield_pct']}%　※配当は会社予想を含みます", 26, BODY),
+    ])
+    _footer(d)
+    img.save(out); return out
+
+
+def build_long_all(data, outdir):
+    """Long version (60s+): list card, one detail card per pick, summary."""
+    os.makedirs(outdir, exist_ok=True)
+    paths = [list_card(data, os.path.join(outdir, "card_list.png"))]
+    for i, p in enumerate(data["picks"]):
+        paths.append(detail_card(p, i, os.path.join(outdir, f"card_detail_{i+1}.png")))
+    paths.append(summary_card(data, os.path.join(outdir, "card_summary.png")))
+    return paths
