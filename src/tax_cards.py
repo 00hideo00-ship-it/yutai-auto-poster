@@ -90,6 +90,9 @@ def detail_card(data, idx, out):
             size -= 3
         d.text((118, y + 64), ln, font=F(BOLD, size), fill=BODY, anchor="lm")
         y += 148
+    note = p.get("footnote")
+    if note:
+        d.text((W // 2, 1150), note, font=F(BOLD, 23), fill=TEAL, anchor="mm")
     _footer(d, FOOTER_DETAIL)
     img.save(out); return out
 
