@@ -10,7 +10,7 @@ import argparse, glob, json, os, subprocess, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "src"))
-import tax_factcheck, tax_cards, music  # noqa: E402
+import tax_factcheck, tax_cards, music, estate_cards  # noqa: E402
 from tax_main import TAX_THEME, LANDING  # noqa: E402
 
 SEGMENTS = [4, 6, 8, 8, 8, 8, 8, 11]  # title, list, 5 detail cards, summary = 61s
@@ -19,6 +19,8 @@ TOTAL = sum(SEGMENTS)
 
 def build_video(data, outdir):
     card_paths = tax_cards.build_all(data, os.path.join(outdir, "cards"))
+    # Hide's request: the trial card uses its own comparison layout.
+    estate_cards.trial_card(data, os.path.join(outdir, "cards", "card_detail_3.png"))
     bgm = music.make_bgm(os.path.join(outdir, "bgm.wav"), dur=float(TOTAL),
                          bpm=TAX_THEME["bpm"], chords=TAX_THEME["chords"],
                          melody=TAX_THEME["melody"])
@@ -71,7 +73,7 @@ def youtube_texts(data):
         lines.append("")
     desc = "\n".join(lines) + (
         "【試算の前提】単身、社会保険料は年収の約14%で概算。給与所得控除195万円（上限）を差し引いた給与所得805万円から、課税所得は約605万円となり、所得税率20%の区分に入ります。"
-        "限界税率は所得税20%（復興特別所得税込みで20.42%）＋住民税10%＝約30.4%です。家族構成や各種控除で実際の税額は変わります。\n\n"
+        "限界税率は所得税20%（復興特別所得税込みで20.42%）＋住民税10%＝約30.4%です。家族構成や各種控除で実際の税額は変わります。税金の目安は、課税所得約605万円で約140万円（所得税の速算表＋住民税10%で計算）、不動産所得の赤字100万円で課税所得が約505万円になると約110万円で、差は約30万円です。\n\n"
         "※2026年11月時点の制度です。税制は変更される場合があります\n"
         "※本動画は一般的な制度紹介であり、投資の勧誘や個別の税務相談ではありません。個別の判断は税理士にご相談ください\n"
         "※数値・条件は国税庁などの公式情報でご確認ください\n\n"
