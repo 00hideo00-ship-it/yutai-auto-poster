@@ -51,7 +51,7 @@ def caption_for(data):
             f"※分配金利回りは基準価額により変動します（{data['yield_basis_label']}）\n"
             f"※分配金には元本の払戻しが含まれる場合があります\n"
             f"※本動画はファンド紹介であり投資推奨ではありません。分配内容・費用は各社目論見書でご確認ください\n"
-            f"#投資信託 #高配当 #分配金 #JREIT #投資初心者")
+            f"#投資信託 #高配当 #分配金 #日本株 #投資初心者")
 
 
 def publish_guide(data, caption):
@@ -68,7 +68,7 @@ def publish_guide(data, caption):
             f"\n■ 投稿前チェック\n"
             f"ファクトチェック済み（{checked}時点）\n"
             f"分配金利回りの基準: {data['yield_basis_label']}\n"
-            f"注意: {data['caveat_label']}。毎月分配型はNISA対象外\n")
+            f"注意: {data['caveat_label']}。分配金は決算ごとに変動し、支払われない場合があります\n")
 
 
 def main():

@@ -8,6 +8,9 @@ number of settlements must equal monthly_distribution_yen x 12 (the monthly
 equivalent used by the base gate), and the stated yield must match
 per-settlement x settlements / NAV. Card labels for such a pick must state
 the real per-settlement amount, never a monthly one.
+
+Also enforces Hide's rule for this edition (2026-11-15): REIT funds are
+excluded entirely, so any pick whose name mentions REIT/リート fails.
 """
 import json, sys, os
 
@@ -19,6 +22,9 @@ def check(data, today=None):
     errors = fund_factcheck.check(data, today=today)
     for i, p in enumerate(data.get("picks", []), 1):
         label = f"pick {i} ({p.get('short_name')})"
+        name_text = f"{p.get('name', '')} {p.get('short_name', '')}"
+        if "REIT" in name_text.upper() or "リート" in name_text:
+            errors.append(f"{label}: REIT funds are excluded from the domestic edition")
         per_year = p.get("settlements_per_year", 12)
         if per_year == 12:
             continue
