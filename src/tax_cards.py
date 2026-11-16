@@ -60,8 +60,12 @@ def _footer(d, text):
     d.text((W // 2, H - 42), text, font=F(REG, 20), fill=TEAL, anchor="mm")
 
 
+def _suffix(data):
+    return data.get("title_suffix", "5選")
+
+
 def list_card(data, out):
-    img, d = _base(f"{data['title_label']} 5選", data["list_subtitle"])
+    img, d = _base(f"{data['title_label']} {_suffix(data)}", data["list_subtitle"])
     y = 205
     for i, p in enumerate(data["picks"]):
         color = ROW_COLORS[i % len(ROW_COLORS)]
@@ -106,7 +110,10 @@ def summary_card(data, out):
         c = random.choice([(13, 148, 136, 120), (245, 158, 11, 130),
                            (45, 180, 165, 120), (253, 211, 77, 130)])
         d.rectangle([x, y, x + 10, y + 5], fill=c)
-    d.text((W // 2, 70), f"まとめ：{data['title_label']} 5選", font=F(BOLD, 40),
+    suffix = _suffix(data)
+    head = (f"まとめ：{data['title_label']}" if suffix == "まとめ"
+            else f"まとめ：{data['title_label']} {suffix}")
+    d.text((W // 2, 70), head, font=F(BOLD, 40),
            fill=TEAL, anchor="mm", stroke_width=5, stroke_fill=AMBER_LIGHT)
     _badge(d, 652, 68, 30)
     d.rounded_rectangle([24, 128, 696, 1108], radius=30, fill=(255, 255, 255, 255),
@@ -160,7 +167,7 @@ def title_card(data, out):
     _badge(d, 646, 76, 37)
     d.text((W // 2, 552), data["title_label"], font=F(BOLD, 88), fill=AMBER_LIGHT,
            anchor="mm", stroke_width=6, stroke_fill=TEAL_DARK)
-    d.text((W // 2, 672), "5選", font=F(BOLD, 88), fill=AMBER_LIGHT,
+    d.text((W // 2, 672), _suffix(data), font=F(BOLD, 88), fill=AMBER_LIGHT,
            anchor="mm", stroke_width=6, stroke_fill=TEAL_DARK)
     d.rounded_rectangle([120, 756, 600, 830], radius=37, fill=AMBER + (255,))
     d.text((W // 2, 793), data["list_subtitle"], font=F(BOLD, 28),
