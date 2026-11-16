@@ -71,15 +71,17 @@ def trial_card(data, out):
     # Only the income-tax share (about JPY200k) is actually refunded in
     # cash after filing; the resident-tax share (about JPY100k) reduces
     # the following year's resident tax instead.
-    d.rounded_rectangle([36, 964, 684, 1076], radius=22, fill=TEAL)
+    d.rounded_rectangle([36, 948, 684, 1104], radius=22, fill=TEAL)
     line1 = "赤字100万円で税金は約30万円軽くなる"
-    _center(d, W // 2, 1000, line1, _fit(d, line1, 620, 24), (255, 255, 255))
+    _center(d, W // 2, 984, line1, _fit(d, line1, 620, 24), (255, 255, 255))
     line2 = "所得税 約20万円は確定申告で還付される"
-    _center(d, W // 2, 1044, line2, _fit(d, line2, 620, 28), AMBER_LIGHT)
+    _center(d, W // 2, 1028, line2, _fit(d, line2, 620, 28), AMBER_LIGHT)
+    line3 = "住民税 約10万円は翌年分が軽くなる"
+    _center(d, W // 2, 1070, line3, _fit(d, line3, 620, 22), (255, 255, 255))
 
     note = p.get("footnote")
     if note:
-        _center(d, W // 2, 1132, note, 22, TEAL)
+        _center(d, W // 2, 1146, note, 22, TEAL)
     tc._footer(d, tc.FOOTER_DETAIL)
     img.save(out)
     return out
