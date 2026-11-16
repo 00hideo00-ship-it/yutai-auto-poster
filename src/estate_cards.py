@@ -12,6 +12,7 @@ import tax_cards as tc
 W, H = tc.W, tc.H
 F, BOLD, REG = tc.F, tc.BOLD, tc.REG
 TEAL, TEAL_DARK, AMBER = tc.TEAL, tc.TEAL_DARK, tc.AMBER
+AMBER_LIGHT = tc.AMBER_LIGHT
 BODY, NAME = tc.BODY, tc.NAME
 GRAY = (107, 114, 128)
 PALE_AMBER = (255, 243, 205)
@@ -66,14 +67,19 @@ def trial_card(data, out):
     panel(372, "赤字100万円の場合", "約505万円", "約110万円",
           PALE_AMBER, AMBER, 4)
 
-    # --- result banner ---
-    d.rounded_rectangle([36, 972, 684, 1052], radius=22, fill=TEAL)
-    banner = "赤字100万円で税金は約30万円軽くなる"
-    _center(d, W // 2, 1012, banner, _fit(d, banner, 620, 27), (255, 255, 255))
+    # --- result banner (Hide: emphasise the refund) ---
+    # Only the income-tax share (about JPY200k) is actually refunded in
+    # cash after filing; the resident-tax share (about JPY100k) reduces
+    # the following year's resident tax instead.
+    d.rounded_rectangle([36, 964, 684, 1076], radius=22, fill=TEAL)
+    line1 = "赤字100万円で税金は約30万円軽くなる"
+    _center(d, W // 2, 1000, line1, _fit(d, line1, 620, 24), (255, 255, 255))
+    line2 = "所得税 約20万円は確定申告で還付される"
+    _center(d, W // 2, 1044, line2, _fit(d, line2, 620, 28), AMBER_LIGHT)
 
     note = p.get("footnote")
     if note:
-        _center(d, W // 2, 1108, note, 22, TEAL)
+        _center(d, W // 2, 1132, note, 22, TEAL)
     tc._footer(d, tc.FOOTER_DETAIL)
     img.save(out)
     return out
