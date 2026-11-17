@@ -137,3 +137,41 @@ def title_card(data, out):
     _footer(d)
     img.save(out); return out
 
+
+
+def detail_card(data, pick, idx, out):
+    """One per-pick detail card for the 61s version, in the yutai pop
+    style: blue background, white boxes with the row color as a bullet."""
+    img = Image.new("RGB", (W, H), (29, 140, 248))
+    d = ImageDraw.Draw(img, "RGBA")
+    random.seed(3)
+    for _ in range(28):
+        x, y = random.randint(-40, W), random.randint(-40, H)
+        r = random.randint(8, 42)
+        d.ellipse([x - r, y - r, x + r, y + r], fill=(255, 255, 255, 26))
+    d.text((W // 2, 78), f"{pick['name']} ({pick['code']})", font=F(BOLD, 46),
+           fill=(239, 68, 68), anchor="mm", stroke_width=7, stroke_fill=(255, 255, 255))
+    d.rounded_rectangle([40, 118, 680, 178], radius=30, fill=(30, 64, 175))
+    d.text((W // 2, 148), f"{data['month_label']}優待 {idx + 1}／5", font=F(BOLD, 30),
+           fill=(255, 255, 255), anchor="mm")
+    color = COLORS[idx % len(COLORS)]
+    y = 210
+    for ln in pick["detail_lines"]:
+        d.rounded_rectangle([36, y, 684, y + 150], radius=24, fill=(255, 255, 255))
+        d.ellipse([64, y + 58, 98, y + 92], fill=color + (255,))
+        d.text((122, y + 75), ln, font=F(BOLD, 31), fill=(17, 24, 39), anchor="lm")
+        y += 168
+    _footer(d)
+    img.save(out); return out
+
+
+def build_long_all(data, outdir):
+    os.makedirs(outdir, exist_ok=True)
+    paths = [
+        title_card(data, os.path.join(outdir, "card_title.png")),
+        list_card(data, os.path.join(outdir, "card_list.png")),
+    ]
+    for i, p in enumerate(data["picks"]):
+        paths.append(detail_card(data, p, i, os.path.join(outdir, f"card_detail_{i + 1}.png")))
+    paths.append(summary_card(data, os.path.join(outdir, "card_summary.png")))
+    return paths
