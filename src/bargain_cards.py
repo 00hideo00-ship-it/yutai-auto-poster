@@ -95,10 +95,15 @@ def title_card(data, out):
     d.text((W // 2, 552), f"1週間で{abs(m['weekly_change_yen']):,.0f}円安",
            font=F(BOLD, 52), fill=CHARCOAL_DARK,
            anchor="mm", stroke_width=5, stroke_fill=WHITE)
-    d.text((W // 2, 640), "AI株が軒並み急落", font=F(BOLD, 52), fill=CHARCOAL_DARK,
+    line3 = m.get("title_line3", "AI株が軒並み急落")
+    size3 = 52
+    while size3 > 24 and d.textlength(line3, font=F(BOLD, size3)) > 612:
+        size3 -= 2
+    d.text((W // 2, 640), line3,
+           font=F(BOLD, size3), fill=CHARCOAL_DARK,
            anchor="mm", stroke_width=5, stroke_fill=WHITE)
     d.rounded_rectangle([120, 706, 600, 786], radius=40, fill=CRIMSON + (255,))
-    d.text((W // 2, 746), "今週の下げから狙い目5選", font=F(BOLD, 32), fill=WHITE, anchor="mm")
+    d.text((W // 2, 746), data["title_label"], font=F(BOLD, 32), fill=WHITE, anchor="mm")
     d.text((W // 2, 838), f"{data['week_label']}・終値ベース", font=F(BOLD, 28),
            fill=BODY, anchor="mm")
     d.text((W // 2, H - 42), FOOTER_TEXT, font=F(REG, 20), fill=CRIMSON_LIGHT, anchor="mm")
@@ -107,7 +112,8 @@ def title_card(data, out):
 
 def list_card(data, out):
     """All 5 picks with weekly drop and the two Friday closes."""
-    img, d = _base("今週の下げ 5選", "11月13日終値 → 11月20日終値")
+    img, d = _base("今週の下げ {0}選".format(len(data["picks"])),
+                   data["picks"][0]["price_date_label"])
     y = 226
     for p in data["picks"]:
         d.rounded_rectangle([28, y, 692, y + 178], radius=26, fill=WHITE + (255,),
@@ -123,8 +129,11 @@ def list_card(data, out):
         d.text((48, y + 78),
                f"{_fmt_yen(p['prev_close'])} → {_fmt_yen(p['close'])}",
                font=F(BOLD, 34), fill=BODY)
-        d.text((48, y + 128), f"100株で{p['min_investment_label']}・{p['business_line']}",
-               font=F(BOLD, 26), fill=BODY)
+        line3 = f"100株で{p['min_investment_label']}・{p['business_line']}"
+        size3 = 26
+        while size3 > 16 and d.textlength(line3, font=F(BOLD, size3)) > 616:
+            size3 -= 1
+        d.text((48, y + 128), line3, font=F(BOLD, size3), fill=BODY)
         y += 192
     _footer(d)
     img.save(out); return out
@@ -170,6 +179,8 @@ def summary_card(data, out):
         x, y = random.randint(0, W), random.randint(0, H)
         c = random.choice([(220, 38, 38, 120), (254, 202, 202, 130),
                            (255, 255, 255, 110), (153, 27, 27, 120)])
+        if y < 120:  # keep the title band clear
+            continue
         d.rectangle([x, y, x + 10, y + 5], fill=c)
     title = f"まとめ：{data['title_label']}"
     tsize = 40

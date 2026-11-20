@@ -3,9 +3,14 @@
 this week, Fri 20:00 post).
 
 First edition: week of 2026-11-16 to 2026-11-20. The Nikkei fell 7.7% in
-the week as US AI stocks sold off after the Anthropic IPO; the 5 picks are
-AI/semiconductor names whose latest earnings (Oct 28-Nov 9) all raised
+the week as US AI stocks sold off after the Anthropic IPO. The v1 picks
+were AI/semiconductor names; Hide then ordered AI-related stocks excluded
+(2026-11-20, outlook too uncertain), so v2 re-selected 5 non-AI names
+(3 megabanks, Fanuc, Mitsubishi Heavy) whose latest earnings all raised
 forecasts, so the drop is a market adjustment, not a company problem.
+Display text that depends on the selection (title-card line 3, caption /
+description / Instagram intros, hashtags, excluded-names note) is read
+from the data file, with the v1 wording as defaults.
 Structure (61s): title 6s, list 7s, stock cards 5 x 7s, summary 13s.
 Crimson x charcoal cards, badge, driving A-minor BGM at 132 BPM
 (BARGAIN_THEME). No posting; Hide publishes manually.
@@ -25,6 +30,12 @@ import bargain_cards
 import music
 
 SEGMENTS = [6, 7, 7, 7, 7, 7, 7, 13]  # title, list, stocks x5, summary = 61s
+
+
+def segments_for(data):
+    """Title 6s + list 7s + 7s per stock + summary fills the rest of 61s."""
+    n = len(data["picks"])
+    return [6, 7] + [7] * n + [61 - 13 - 7 * n]
 LANDING_URL = ("https://muse.ai/s/tou-zi-da-hao-ki-shou-kemin-pezi-xop6xzxuxsng8w8/"
                "k3ru9cej7TKfxuaIdLAMDCxtN-lr54HyOVmqpbWFP2s")
 VIDEO_NAME = "bargain-2026-11-20_tiktok_61s_v1.mp4"
@@ -36,17 +47,18 @@ def _fmt_yen(v):
     return "{:,}円".format(v)
 
 
-def build_video(data, outdir):
+def build_video(data, outdir, video_name=None):
     card_paths = bargain_cards.build_all_long(data, os.path.join(outdir, "cards"))
     bgm = music.make_bgm(os.path.join(outdir, "bgm.wav"), dur=61.0, **music.BARGAIN_THEME)
-    video = os.path.join(outdir, VIDEO_NAME)
+    video = os.path.join(outdir, video_name or VIDEO_NAME)
+    segments = segments_for(data)
     inputs = "".join("[{0}:v]fps=30,format=yuv420p[v{0}];".format(i) for i in range(len(card_paths)))
     concat = "".join("[v{0}]".format(i) for i in range(len(card_paths)))
     fc = (inputs + concat + "concat=n={0}:v=1:a=0[v];".format(len(card_paths))
           + "[{0}:a]atrim=0:61,afade=t=out:st=59:d=2,".format(len(card_paths))
           + "aformat=sample_rates=44100:channel_layouts=stereo[a]")
     cmd = ["ffmpeg", "-nostdin", "-y", "-v", "error"]
-    for path, dur in zip(card_paths, SEGMENTS):
+    for path, dur in zip(card_paths, segments):
         cmd += ["-loop", "1", "-t", str(dur), "-i", path]
     cmd += ["-i", bgm, "-filter_complex", fc, "-map", "[v]", "-map", "[a]",
             "-c:v", "libx264", "-preset", "veryfast", "-crf", "22",
@@ -59,7 +71,9 @@ def build_video(data, outdir):
         raise RuntimeError("video duration {0}s is not 61s".format(dur))
     probe = os.path.join(outdir, "probe")
     os.makedirs(probe, exist_ok=True)
-    for t in (3, 9, 16, 23, 30, 37, 44, 54):
+    n = len(data["picks"])
+    probe_times = [3, 9] + [16 + 7 * i for i in range(n)] + [54]
+    for t in probe_times:
         subprocess.run(["ffmpeg", "-nostdin", "-y", "-v", "error", "-ss", str(t),
                         "-i", video, "-frames:v", "1", "-q:v", "4",
                         os.path.join(probe, "frame_{0}s.jpg".format(t))], check=True)
@@ -71,34 +85,40 @@ def caption_for(data):
     lines = []
     lines.append("【{0}】日経平均が1週間で{1}%・{2:,.0f}円安📉".format(
         data["title_label"], m["weekly_change_pct"], abs(m["weekly_change_yen"])))
-    lines.append("米AI株安の波及でAI・半導体株が軒並み急落。でも紹介する5銘柄は、"
-                 "10月末〜11月の決算でそろって好業績を示した銘柄ばかりです")
+    lines.append(data.get("caption_intro",
+                          "米AI株安の波及でAI・半導体株が軒並み急落。でも紹介する5銘柄は、"
+                          "10月末〜11月の決算でそろって好業績を示した銘柄ばかりです"))
     for p in data["picks"]:
         lines.append("{0}位 {1} {2}%（{3}→{4}）".format(
             p["rank"], p["name"], p["weekly_change_pct"],
             _fmt_yen(p["prev_close"]), _fmt_yen(p["close"])))
     lines.append("※本動画は銘柄紹介であり投資推奨ではありません。"
                  "株価はさらに下落する場合があります")
-    lines.append("#日本株 #半導体株 #AI株 #株 #投資初心者 #資産形成 #お金の勉強")
+    lines.append(data.get("hashtags",
+                          "#日本株 #半導体株 #AI株 #株 #投資初心者 #資産形成 #お金の勉強"))
     return "\n".join(lines)
 
 
 def youtube_title(data):
     m = data["market"]
-    return "【{0}】日経平均が週間{1}%・{2:,.0f}円安｜AI株急落でも決算は好調な{3}銘柄".format(
+    tail = data.get("youtube_title_tail",
+                    "AI株急落でも決算は好調な{0}銘柄").format(len(data["picks"]))
+    return "【{0}】日経平均が週間{1}%・{2:,.0f}円安｜{3}".format(
         data["title_label"], m["weekly_change_pct"],
-        abs(m["weekly_change_yen"]), len(data["picks"]))
+        abs(m["weekly_change_yen"]), tail)
 
 
 def youtube_description(data):
     m = data["market"]
     parts = []
+    lead = data.get("youtube_lead",
+                    "紹介する{0}銘柄は、いずれも10月末〜11月の決算で上方修正や好調な見通しを発表した銘柄で、"
+                    "今週の下げは市場全体の調整によるものです。".format(len(data["picks"])))
     parts.append("{0}、{1}は{2}から{3}へ、1週間で{4}%下落しました。{5}。"
-                 "紹介する{6}銘柄は、いずれも10月末〜11月の決算で上方修正や好調な見通しを発表した銘柄で、"
-                 "今週の下げは市場全体の調整によるものです。\n".format(
+                 "{6}\n".format(
                      data["week_label"], m["index"], m["prev_close_label"],
                      m["close_label"], m["weekly_change_pct"], m["context"],
-                     len(data["picks"])))
+                     lead))
     for p in data["picks"]:
         parts.append(
             "■ {0}位 {1}（{2}・{3}）　週間 {4}%\n".format(
@@ -109,14 +129,17 @@ def youtube_description(data):
             + "・下落の理由：{0}\n".format("／".join(p["reason_lines"]))
             + "・注意点：{0}\n".format("／".join(p["caution_lines"])))
     parts.append(
-        "※株価はYahoo Finance（{0}終値）で確認。"
-        "決算内容は各社の決算短信・開示資料で確認（{0}時点）。"
-        "株価・業績は変わる場合があります\n".format(data["checked_date"])
+        "※株価は{0}で確認。"
+        "決算内容は各社の決算短信・開示資料で確認（{1}時点）。"
+        "株価・業績は変わる場合があります\n".format(
+            data.get("price_source_label", "Yahoo Finance（終値）"),
+            data["checked_date"])
         + "※本動画は銘柄紹介であり投資推奨ではありません\n\n"
         + "▼お役立ちリンク集（SNSまとめ）\n" + LANDING_URL + "\n"
         + "▼TikTok\nhttps://www.tiktok.com/@toushi_daisuki\n"
         + "▼Instagram\nhttps://www.instagram.com/toushi_daisuki_\n\n"
-        + "#日本株 #半導体株 #AI株 #株 #投資初心者 #資産形成 #お金の勉強 #Shorts")
+        + data.get("hashtags",
+                   "#日本株 #半導体株 #AI株 #株 #投資初心者 #資産形成 #お金の勉強") + " #Shorts")
     return "\n".join(parts)
 
 
@@ -126,20 +149,23 @@ def instagram_caption(data):
     lines.append("【{0}】\n".format(data["title_label"]))
     lines.append("日経平均が1週間で{0}%・{1:,.0f}円安になった今週📉\n".format(
         m["weekly_change_pct"], abs(m["weekly_change_yen"])))
-    lines.append("米AI株安の波及で、AI・半導体株が軒並み下がりました。\n"
-                 "でも紹介する5銘柄は、10月末〜11月の決算でそろって好業績を示した銘柄ばかり。\n"
-                 "下げた理由と注意点をまとめました。\n")
+    lines.append(data.get("ig_intro",
+                          "米AI株安の波及で、AI・半導体株が軒並み下がりました。\n"
+                          "でも紹介する5銘柄は、10月末〜11月の決算でそろって好業績を示した銘柄ばかり。\n"
+                          "下げた理由と注意点をまとめました。\n"))
     for p in data["picks"]:
         lines.append("{0}位 {1} {2}%".format(p["rank"], p["name"], p["weekly_change_pct"]))
     lines.append("\n※本動画は銘柄紹介であり投資推奨ではありません。"
                  "株価はさらに下落する場合があります\n")
-    lines.append("#日本株 #半導体株 #AI株 #株 #投資初心者 #資産形成 #お金の勉強")
+    lines.append(data.get("hashtags",
+                          "#日本株 #半導体株 #AI株 #株 #投資初心者 #資産形成 #お金の勉強"))
     return "\n".join(lines)
 
 
 def publish_guide(data, caption):
     return (
-        "【手動公開ガイド】{0}（61秒版・2026年11月20日作成）\n".format(data["title_label"])
+        "【手動公開ガイド】{0}（61秒版・2026年11月20日作成{1}）\n".format(
+            data["title_label"], data.get("guide_suffix", ""))
         + "投稿予定：TikTok 金曜20:00（2026年11月20日）\n"
         + "\n■ TikTok\nキャプション（そのままコピーして貼り付け）\n" + caption + "\n"
         + "\n投稿設定\n"
@@ -158,16 +184,22 @@ def publish_guide(data, caption):
         + "\n設定: カバーは先頭フレーム（タイトルカード）／AIラベルをオン／フィードにもシェアをオン\n"
         + "\n■ 投稿前チェック\n"
         + "ファクトチェック済み（{0}時点）\n".format(data["checked_date"])
-        + "出典: 各銘柄の決算短信・開示資料、Yahoo Finance（株価）、日本経済新聞（日経平均終値）、ロイター（市場全体の動き）\n"
+        + "出典: 各銘柄の決算短信・開示資料、{0}、日本経済新聞（日経平均終値）、ロイター（市場全体の動き）\n".format(
+            data.get("price_source_label", "Yahoo Finance（株価）"))
         + "注意: 本動画は銘柄紹介であり投資推奨ではありません。株価はさらに下落する場合があります。\n"
-        + "ソフトバンクグループ（9984）は11月10日の中間期決算で7,680億円の純損失を発表しており、"
-        + "今週の下げに決算要因が含まれるため選定から外しました\n"
+        + data.get("excluded_note",
+                   "ソフトバンクグループ（9984）は11月10日の中間期決算で7,680億円の純損失を発表しており、"
+                   "今週の下げに決算要因が含まれるため選定から外しました") + "\n"
     )
 
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--file", default="data/bargain_2026-11-20.json")
+    ap.add_argument("--video-name", default=None,
+                    help="output video filename (default: VIDEO_NAME constant)")
+    ap.add_argument("--guide-name", default="publish_guide.txt",
+                    help="publish guide filename in the output dir")
     args = ap.parse_args()
 
     data_path = os.path.join(ROOT, args.file)
@@ -186,7 +218,7 @@ def main():
 
     outdir = os.path.join(ROOT, "output", "bargain-{0}".format(tag))
     os.makedirs(outdir, exist_ok=True)
-    video = build_video(data, outdir)
+    video = build_video(data, outdir, video_name=args.video_name)
     caption = caption_for(data)
     package = {"series": "bargain", "tag": tag, "video": video,
                "caption": caption, "duration_sec": 61, "fact_check": "passed",
@@ -194,7 +226,7 @@ def main():
     print("video built: {0}".format(video))
     with open(os.path.join(outdir, "post_package.json"), "w", encoding="utf-8") as f:
         json.dump(package, f, ensure_ascii=False, indent=2)
-    guide_path = os.path.join(outdir, "publish_guide.txt")
+    guide_path = os.path.join(outdir, args.guide_name)
     with open(guide_path, "w", encoding="utf-8") as f:
         f.write(publish_guide(data, caption))
     print("publish guide: {0}".format(guide_path))
