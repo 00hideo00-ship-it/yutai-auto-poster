@@ -71,6 +71,30 @@ def check(data, today=None):
         errors.append("next_week.rights_date is not YYYY-MM-DD")
     if not str(nw.get("source_url", "")).startswith("https://"):
         errors.append("next_week: source_url must be https")
+    for field in ("header", "subtitle", "summary_line", "summary_sub", "caption_line"):
+        if not nw.get(field):
+            errors.append(f"next_week: missing field {field}")
+    for note in nw.get("notes", []):
+        if len(str(note)) > 40:
+            errors.append(f"next_week note too long for card: {note}")
+    # Opening hook (Hide's rule, 2026-11-19): concrete amount / deadline
+    hook = data.get("hook_lines", [])
+    if not (1 <= len(hook) <= 2):
+        errors.append("hook_lines must have 1-2 lines")
+    for ln in hook:
+        if len(str(ln)) > 24:
+            errors.append(f"hook line too long for title card ({len(ln)} chars): {ln}")
+        for b in BANNED_PHRASES:
+            if b in str(ln):
+                errors.append(f"hook: banned phrase '{b}' in: {ln}")
+    if not data.get("rights_fall_label"):
+        errors.append("missing top-level field rights_fall_label")
+    for j, item in enumerate(data.get("also_this_week", []), 1):
+        for field in ("name", "code", "line"):
+            if field not in item:
+                errors.append(f"also_this_week item {j}: missing field {field}")
+        if not re.fullmatch(r"\d{4}", str(item.get("code", ""))):
+            errors.append(f"also_this_week item {j}: code '{item.get('code')}' is not 4 digits")
     for j, item in enumerate(nw.get("items", []), 1):
         for field in ("name", "code", "line"):
             if field not in item:

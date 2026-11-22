@@ -71,6 +71,16 @@ def title_card(data, out):
     d.rounded_rectangle([60, 806, 660, 880], radius=37, fill=ORANGE)
     d.text((W // 2, 843), data["week_label"], font=F(BOLD, 29),
            fill=(255, 255, 255), anchor="mm")
+    # Opening hook (Hide's rule, 2026-11-19): concrete amount / deadline
+    # in the first 3 seconds, not just the theme name.
+    hook = data.get("hook_lines", [])
+    if hook:
+        d.rounded_rectangle([36, 950, 684, 1066], radius=28, fill=ORANGE)
+        d.text((W // 2, 1008), hook[0], font=F(BOLD, 34),
+               fill=(255, 255, 255), anchor="mm")
+    if len(hook) > 1:
+        d.text((W // 2, 1116), hook[1], font=F(BOLD, 32),
+               fill=ORANGE_DARK, anchor="mm")
     _footer(d)
     img.save(out); return out
 
@@ -103,10 +113,10 @@ def preview_card(data, out):
     img, d = _cream_base()
     nw = data["next_week"]
     d.rounded_rectangle([36, 96, 684, 168], radius=30, fill=ORANGE)
-    d.text((W // 2, 132), "来週の予告", font=F(BOLD, 40), fill=(255, 255, 255), anchor="mm")
+    d.text((W // 2, 132), nw.get("header", "来週の予告"), font=F(BOLD, 40), fill=(255, 255, 255), anchor="mm")
     d.text((W // 2, 220), f"{nw['rights_label']} 権利付き最終日",
            font=F(BOLD, 38), fill=ORANGE_DARK, anchor="mm")
-    d.text((W // 2, 272), "11月末が権利確定日の銘柄群", font=F(REG, 28), fill=GRAY, anchor="mm")
+    d.text((W // 2, 272), nw.get("subtitle", ""), font=F(REG, 28), fill=GRAY, anchor="mm")
     y = 320
     for item in nw["items"]:
         d.rounded_rectangle([36, y, 684, y + 158], radius=22, fill=(255, 255, 255))
@@ -114,10 +124,9 @@ def preview_card(data, out):
                font=F(BOLD, 34), fill=INK)
         d.text((64, y + 72), item["line"], font=F(BOLD, 30), fill=GRAY)
         y += 176
-    d.text((W // 2, y + 30), "※キユーピーは6ヶ月以上の保有が必要です",
-           font=F(REG, 26), fill=GRAY, anchor="mm")
-    d.text((W // 2, y + 72), "※詳細は来週の動画で紹介します",
-           font=F(REG, 26), fill=GRAY, anchor="mm")
+    for k, note in enumerate(nw.get("notes", [])[:2]):
+        d.text((W // 2, y + 30 + k * 42), note,
+               font=F(REG, 26), fill=GRAY, anchor="mm")
     _footer(d)
     img.save(out); return out
 
@@ -139,14 +148,14 @@ def summary_card(data, out):
         d.text((140, y + 116), p["dividend_line"], font=F(BOLD, 28), fill=GRAY)
         y += 190
     d.rounded_rectangle([24, 790, 696, 940], radius=22, fill=ORANGE)
-    d.text((W // 2, 838), f"来週 {data['next_week']['rights_label']} 月末組が本番",
+    d.text((W // 2, 838), data["next_week"].get("summary_line", ""),
            font=F(BOLD, 32), fill=(255, 255, 255), anchor="mm")
-    d.text((W // 2, 890), "タマホーム・キユーピーなど", font=F(BOLD, 28),
+    d.text((W // 2, 890), data["next_week"].get("summary_sub", ""), font=F(BOLD, 28),
            fill=(255, 255, 255), anchor="mm")
     d.rounded_rectangle([24, 970, 696, 1210], radius=22, fill=(31, 41, 55))
     d.text((W // 2, 1018), "⚠ 権利付き最終日の15:30までに買う", font=F(BOLD, 30),
            fill=(255, 255, 255), anchor="mm")
-    d.text((W // 2, 1072), "権利落ち日は翌営業日 11/19(木)", font=F(BOLD, 28),
+    d.text((W // 2, 1072), data.get("rights_fall_label", ""), font=F(BOLD, 28),
            fill=(255, 255, 255), anchor="mm")
     d.text((W // 2, 1126), "優待・配当は変更される場合があります", font=F(REG, 26),
            fill=(255, 255, 255), anchor="mm")
