@@ -129,8 +129,151 @@ def detail_card(data, idx, out):
             size -= 3
         d.text((118, y + 64), ln, font=F(BOLD, size), fill=BODY, anchor="lm")
         y += 148
+    _illustration(d, idx, y)
     _footer(d, FOOTER_DETAIL)
     img.save(out); return out
+
+
+# --- Detail-card illustrations (v2, Hide 2026-11-23): one flat PIL drawing
+# per pick in the free band under the detail rows, so the switch between
+# detail cards reads clearly. Palette stays teal x amber.
+
+def _coin(d, cx, cy, r):
+    """Gold yen coin."""
+    d.ellipse([cx - r, cy - r, cx + r, cy + r], fill=AMBER,
+              outline=(217, 119, 6), width=max(2, int(r * 0.12)))
+    ri = r * 0.66
+    d.ellipse([cx - ri, cy - ri, cx + ri, cy + ri],
+              outline=AMBER_LIGHT, width=max(2, int(r * 0.12)))
+    d.text((cx, cy - 1), "\u00a5", font=F(BOLD, int(r * 1.02)),
+           fill=(255, 255, 255), anchor="mm")
+
+
+def _illus_chart(d, cx, cy, s):
+    """Pick 1 - salary trend: line dips, then climbs past the start."""
+    x0, x1 = cx - 255 * s, cx + 255 * s
+    yb = cy + 115 * s
+    d.line([x0, yb, x1, yb], fill=TEAL, width=max(3, int(5 * s)))
+    d.line([x0, yb, x0, cy - 125 * s], fill=TEAL, width=max(3, int(5 * s)))
+    pts = [(x0 + 35 * s, cy - 35 * s), (cx - 60 * s, cy + 60 * s),
+           (cx + 70 * s, cy - 5 * s), (x1 - 30 * s, cy - 100 * s)]
+    d.line(pts, fill=TEAL_DARK, width=max(4, int(9 * s)), joint="curve")
+    for px, py in pts[:-1]:
+        r = 11 * s
+        d.ellipse([px - r, py - r, px + r, py + r], fill=AMBER,
+                  outline=TEAL_DARK, width=max(2, int(3 * s)))
+    _coin(d, pts[-1][0], pts[-1][1], 30 * s)
+
+
+def _illus_pig(d, cx, cy, s):
+    """Pick 2 - pension premium: piggy bank with a coin dropping in."""
+    w3 = max(2, int(3 * s))
+    for lx in (cx - 95 * s, cx + 55 * s):  # legs (behind body)
+        d.rounded_rectangle([lx, cy + 78 * s, lx + 35 * s, cy + 118 * s],
+                            radius=int(8 * s), fill=(253, 214, 130),
+                            outline=AMBER, width=w3)
+    d.arc([cx - 188 * s, cy - 32 * s, cx - 132 * s, cy + 28 * s],
+          start=80, end=310, fill=AMBER, width=max(3, int(6 * s)))
+    d.ellipse([cx - 155 * s, cy - 65 * s, cx + 155 * s, cy + 100 * s],
+              fill=(254, 230, 170), outline=AMBER, width=max(3, int(4 * s)))
+    d.polygon([(cx - 110 * s, cy - 42 * s), (cx - 76 * s, cy - 90 * s),
+               (cx - 40 * s, cy - 40 * s)], fill=(253, 214, 130), outline=AMBER)
+    d.ellipse([cx + 92 * s, cy - 8 * s, cx + 168 * s, cy + 52 * s],
+              fill=(253, 214, 130), outline=AMBER, width=w3)
+    for nx in (cx + 118 * s, cx + 142 * s):
+        r = 4.5 * s
+        d.ellipse([nx - r, cy + 22 * s - r, nx + r, cy + 22 * s + r], fill=TEAL_DARK)
+    r = 7 * s
+    d.ellipse([cx + 52 * s - r, cy - 22 * s - r, cx + 52 * s + r, cy - 22 * s + r],
+              fill=TEAL_DARK)
+    d.line([cx - 38 * s, cy - 56 * s, cx + 30 * s, cy - 56 * s],
+           fill=TEAL_DARK, width=max(3, int(7 * s)))
+    _coin(d, cx - 5 * s, cy - 118 * s, 30 * s)
+    for mx in (cx - 52 * s, cx + 42 * s):  # motion ticks beside the coin
+        d.line([mx, cy - 100 * s, mx, cy - 76 * s], fill=TEAL, width=max(2, int(4 * s)))
+
+
+def _illus_medical(d, cx, cy, s):
+    """Pick 3 - health / care insurance: medical cross badge + heart."""
+    bx0, bx1 = cx - 205 * s, cx - 5 * s
+    d.rounded_rectangle([bx0, cy - 105 * s, bx1, cy + 105 * s],
+                        radius=int(24 * s), fill=(255, 255, 255),
+                        outline=TEAL, width=max(3, int(5 * s)))
+    ccx = (bx0 + bx1) / 2
+    d.rectangle([ccx - 20 * s, cy - 62 * s, ccx + 20 * s, cy + 62 * s], fill=TEAL)
+    d.rectangle([ccx - 62 * s, cy - 20 * s, ccx + 62 * s, cy + 20 * s], fill=TEAL)
+    hx, hy, r = cx + 128 * s, cy - 2 * s, 88 * s
+    d.ellipse([hx - 1.05 * r, hy - 0.88 * r, hx + 0.05 * r, hy + 0.22 * r], fill=AMBER)
+    d.ellipse([hx - 0.05 * r, hy - 0.88 * r, hx + 1.05 * r, hy + 0.22 * r], fill=AMBER)
+    d.polygon([(hx - 1.0 * r, hy - 0.08 * r), (hx + 1.0 * r, hy - 0.08 * r),
+               (hx, hy + 1.05 * r)], fill=AMBER)
+    hr = 13 * s
+    d.ellipse([hx - 0.52 * r - hr, hy - 0.52 * r - hr, hx - 0.52 * r + hr,
+               hy - 0.52 * r + hr], fill=AMBER_LIGHT)
+
+
+def _illus_wallet(d, cx, cy, s):
+    """Pick 4 - total employee burden: pay envelope, coins deducted away."""
+    ex0, ex1 = cx - 245 * s, cx + 25 * s
+    ey0, ey1 = cy - 55 * s, cy + 105 * s
+    d.rectangle([ex0, ey0, ex1, ey1], fill=(254, 230, 170),
+                outline=AMBER, width=max(3, int(4 * s)))
+    d.polygon([(ex0, ey0), (ex1, ey0), ((ex0 + ex1) / 2, ey0 + 88 * s)],
+              fill=(253, 214, 130), outline=AMBER)
+    _coin(d, (ex0 + ex1) / 2, cy + 42 * s, 30 * s)
+    ax0, ay0 = cx + 52 * s, cy - 110 * s
+    ax1, ay1 = cx + 228 * s, cy + 38 * s
+    n = 8  # dashed trajectory running above the trail of shrinking coins
+    for i in range(n):
+        if i % 2 == 0:
+            t0, t1 = i / n, (i + 0.82) / n
+            d.line([ax0 + (ax1 - ax0) * t0, ay0 + (ay1 - ay0) * t0,
+                    ax0 + (ax1 - ax0) * t1, ay0 + (ay1 - ay0) * t1],
+                   fill=TEAL, width=max(3, int(5 * s)))
+    ux, uy = 0.765, 0.643  # unit vector along the dashed line
+    tip = (ax1 + 18 * s * ux, ay1 + 18 * s * uy)
+    b1 = (ax1 - 4 * s * ux - 14 * s * uy, ay1 - 4 * s * uy + 14 * s * ux)
+    b2 = (ax1 - 4 * s * ux + 14 * s * uy, ay1 - 4 * s * uy - 14 * s * ux)
+    d.polygon([tip, b1, b2], fill=TEAL)
+    _coin(d, cx + 100 * s, cy - 30 * s, 26 * s)
+    _coin(d, cx + 163 * s, cy + 18 * s, 21 * s)
+    _coin(d, cx + 218 * s, cy + 62 * s, 16 * s)
+
+def _illus_wall(d, cx, cy, s):
+    """Pick 5 - tax threshold: arrow rising over a brick wall (the 'wall')."""
+    wx0 = cx - 262 * s
+    wy, bh = cy + 2 * s, 42 * s
+    joints = [[0, 103, 203, 310], [0, 52, 155, 258, 310], [0, 103, 203, 310]]
+    for i, js in enumerate(joints):
+        yy = wy + i * bh
+        for j, (a, b) in enumerate(zip(js, js[1:])):
+            d.rounded_rectangle([wx0 + (a + 3) * s, yy + 3 * s,
+                                 wx0 + (b - 3) * s, yy + bh - 3 * s],
+                                radius=int(6 * s),
+                                fill=(253, 214, 130) if (i + j) % 2 else AMBER_LIGHT,
+                                outline=(217, 119, 6), width=max(2, int(2 * s)))
+    pts = [(cx - 238 * s, cy + 108 * s), (cx - 140 * s, cy - 12 * s),
+           (cx - 10 * s, cy - 68 * s), (cx + 218 * s, cy - 54 * s)]
+    d.line(pts, fill=TEAL, width=max(4, int(15 * s)), joint="curve")
+    d.polygon([(cx + 262 * s, cy - 57 * s), (cx + 206 * s, cy - 84 * s),
+               (cx + 210 * s, cy - 26 * s)], fill=TEAL)
+
+_ILLUS = [_illus_chart, _illus_pig, _illus_medical, _illus_wallet, _illus_wall]
+
+
+def _illustration(d, idx, y_after):
+    """White stage panel + the pick's illustration, under the detail rows.
+    y_after is the y just past the last row slot (last row bottom = y_after-20)."""
+    top = y_after - 6
+    bottom = H - 84
+    if bottom - top < 120:
+        return
+    d.rounded_rectangle([52, top, 668, bottom], radius=24,
+                        fill=(255, 255, 255, 255), outline=TEAL + (255,), width=3)
+    cx = W // 2
+    cy = (top + bottom) // 2
+    s = min((bottom - top - 24) / 300.0, 1.0)
+    _ILLUS[idx % len(_ILLUS)](d, cx, cy, s)
 
 
 def summary_card(data, out):
