@@ -301,29 +301,49 @@ def summary_card(data, out):
         c = random.choice([(13, 148, 136, 120), (245, 158, 11, 130),
                            (45, 180, 165, 120), (253, 211, 77, 130)])
         d.rectangle([x, y, x + 10, y + 5], fill=c)
-    summary_title = data.get("summary_title", "まとめ：手取りが増えない理由")
-    d.text((W // 2, 70), summary_title, font=F(BOLD, _fit(d, summary_title, 36, 540)),
-           fill=TEAL, anchor="mm", stroke_width=5, stroke_fill=AMBER_LIGHT)
-    _badge(d, 660, 66, 27)
-    d.rounded_rectangle([24, 128, 696, 1108], radius=30, fill=(255, 255, 255, 255),
+    # v5 (Hide 2026-11-23): the conclusion is the hero of this card.
+    # The header keeps only the small label; the conclusion sentence
+    # (from data's summary_title after the label) is set as the largest
+    # type on the card inside an amber banner, with its final keyword
+    # on a teal pill in gold. Checklist rows keep their v4 content,
+    # only tightened to make room; nothing else on the card changes.
+    full_title = data.get("summary_title", "まとめ：手取りが増えない理由は社会保険料")
+    if "：" in full_title:
+        label, conclusion = full_title.split("：", 1)
+    else:
+        label, conclusion = "まとめ", full_title
+    d.text((W // 2, 52), label, font=F(BOLD, 34), fill=TEAL, anchor="mm",
+           stroke_width=4, stroke_fill=AMBER_LIGHT)
+    _badge(d, 660, 52, 26)
+    head, tail = conclusion, ""
+    if conclusion.endswith("社会保険料"):
+        head, tail = conclusion[:-len("社会保険料")], "社会保険料"
+    d.rounded_rectangle([24, 88, 696, 300], radius=28, fill=AMBER + (255,),
+                        outline=TEAL_DARK + (255,), width=4)
+    d.text((W // 2, 140), head, font=F(BOLD, _fit(d, head, 44, 620)),
+           fill=TEAL_DARK, anchor="mm")
+    if tail:
+        d.rounded_rectangle([92, 176, 628, 284], radius=24, fill=TEAL + (255,))
+        d.text((W // 2, 231), tail, font=F(BOLD, _fit(d, tail, 84, 500)),
+               fill=AMBER_LIGHT, anchor="mm")
+    d.rounded_rectangle([24, 324, 696, 1108], radius=30, fill=(255, 255, 255, 255),
                         outline=TEAL + (255,), width=3)
-    y = 148
+    y = 340
     for i, p in enumerate(data["picks"]):
         color = ROW_COLORS[i % len(ROW_COLORS)]
-        d.rounded_rectangle([44, y, 676, y + 172], radius=22, fill=color + (255,),
+        d.rounded_rectangle([44, y, 676, y + 138], radius=22, fill=color + (255,),
                             outline=TEAL + (255,), width=3)
-        cx, cy, r = 92, y + 86, 27  # exactly one check per row
+        cx, cy, r = 88, y + 69, 24  # exactly one check per row
         d.ellipse([cx - r, cy - r, cx + r, cy + r], fill=TEAL, outline=AMBER, width=3)
-        d.line([(cx - 13, cy), (cx - 3, cy + 11), (cx + 15, cy - 12)], fill=(255, 255, 255), width=7, joint="curve")
-        d.text((140, y + 18), p["name"], font=F(BOLD, 33), fill=NAME)
+        d.line([(cx - 11, cy), (cx - 2, cy + 10), (cx + 13, cy - 11)], fill=(255, 255, 255), width=6, joint="curve")
+        d.text((132, y + 14), p["name"], font=F(BOLD, _fit(d, p["name"], 31, 520)), fill=NAME)
         for j, ln in enumerate(p["summary_lines"]):
-            d.text((140, y + 66 + j * 46), ln, font=F(BOLD, 27), fill=BODY)
-        y += 188
+            d.text((132, y + 58 + j * 42), ln, font=F(BOLD, 25), fill=BODY)
+        y += 152
     d.rounded_rectangle([24, 1132, 696, 1248], radius=22, fill=TEAL + (255,))
     d.text((W // 2, 1172), "※数値は国税庁・協会けんぽ等の公表値です", font=F(BOLD, 27), fill=(255, 255, 255), anchor="mm")
     d.text((W // 2, 1216), "本人負担率は各料率からの試算です", font=F(REG, 24), fill=(255, 255, 255), anchor="mm")
     img.save(out); return out
-
 
 def build_all(data, outdir):
     os.makedirs(outdir, exist_ok=True)
