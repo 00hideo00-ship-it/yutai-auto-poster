@@ -53,6 +53,8 @@ def _base(title, subtitle):
     _bubbles(d)
     d.rounded_rectangle([16, 16, 704, 196], radius=28, fill=TEAL + (255,))
     title_size = 58 if len(title) <= 9 else 50
+    while title_size > 30 and d.textlength(title, font=F(BOLD, title_size)) > 500:
+        title_size -= 2  # keep clear of the badge at top-right
     d.text((W // 2, 78), title, font=F(BOLD, title_size), fill=AMBER_LIGHT, anchor="mm",
            stroke_width=6, stroke_fill=TEAL_DARK)
     sub_size = 34 if len(subtitle) <= 15 else (26 if len(subtitle) <= 24 else 22)
@@ -106,8 +108,9 @@ def list_card(data, out):
         color = ROW_COLORS[i % len(ROW_COLORS)]
         d.rounded_rectangle([28, y, 692, y + 178], radius=26, fill=color + (255,),
                             outline=TEAL + (255,), width=3)
-        head = f"{i+1}) {p['name']}"
-        d.text((48, y + 14), head, font=F(BOLD, 35), fill=NAME)
+        stage = p.get("stage", "")
+        head = f"{i+1}) 【{stage}】{p['name']}" if stage else f"{i+1}) {p['name']}"
+        d.text((48, y + 14), head, font=F(BOLD, _fit(d, head, 35, 624)), fill=NAME)
         for j, ln in enumerate(p["list_lines"]):
             d.text((48, y + 66 + j * 50), ln, font=F(BOLD, 30), fill=BODY)
         y += 192
@@ -117,7 +120,9 @@ def list_card(data, out):
 
 def detail_card(data, idx, out):
     p = data["picks"][idx]
-    img, d = _base(p["name"], f"理由 {idx+1}／{len(data['picks'])}")
+    stage = p.get("stage", "")
+    subtitle = f"{stage} {idx+1}／{len(data['picks'])}" if stage else f"理由 {idx+1}／{len(data['picks'])}"
+    img, d = _base(p["name"], subtitle)
     # Message line (v3, Hide 2026-11-23): the card's one-line conclusion on
     # an amber band directly under the header, so a first-time viewer gets
     # the point before the detail rows. Rows shift down to make room.
@@ -175,7 +180,7 @@ def _illus_chart(d, cx, cy, s):
 
 
 def _illus_pig(d, cx, cy, s):
-    """Pick 2 - pension premium: piggy bank with a coin dropping in."""
+    """Pick 3 - pension premium: piggy bank with a coin dropping in."""
     w3 = max(2, int(3 * s))
     for lx in (cx - 95 * s, cx + 55 * s):  # legs (behind body)
         d.rounded_rectangle([lx, cy + 78 * s, lx + 35 * s, cy + 118 * s],
@@ -203,7 +208,7 @@ def _illus_pig(d, cx, cy, s):
 
 
 def _illus_medical(d, cx, cy, s):
-    """Pick 3 - health / care insurance: medical cross badge + heart."""
+    """Pick 4 - health / care insurance: medical cross badge + heart."""
     bx0, bx1 = cx - 205 * s, cx - 5 * s
     d.rounded_rectangle([bx0, cy - 105 * s, bx1, cy + 105 * s],
                         radius=int(24 * s), fill=(255, 255, 255),
@@ -222,7 +227,7 @@ def _illus_medical(d, cx, cy, s):
 
 
 def _illus_wallet(d, cx, cy, s):
-    """Pick 4 - total employee burden: pay envelope, coins deducted away."""
+    """Pick 2 - total employee burden: pay envelope, coins deducted away."""
     ex0, ex1 = cx - 245 * s, cx + 25 * s
     ey0, ey1 = cy - 55 * s, cy + 105 * s
     d.rectangle([ex0, ey0, ex1, ey1], fill=(254, 230, 170),
@@ -267,7 +272,9 @@ def _illus_wall(d, cx, cy, s):
     d.polygon([(cx + 262 * s, cy - 57 * s), (cx + 206 * s, cy - 84 * s),
                (cx + 210 * s, cy - 26 * s)], fill=TEAL)
 
-_ILLUS = [_illus_chart, _illus_pig, _illus_medical, _illus_wallet, _illus_wall]
+# v4 order (前提 -> 核心 -> 内訳1 -> 内訳2 -> 対比):
+# chart, wallet (pay envelope), pig, medical, wall.
+_ILLUS = [_illus_chart, _illus_wallet, _illus_pig, _illus_medical, _illus_wall]
 
 
 def _illustration(d, idx, y_after):
@@ -294,7 +301,8 @@ def summary_card(data, out):
         c = random.choice([(13, 148, 136, 120), (245, 158, 11, 130),
                            (45, 180, 165, 120), (253, 211, 77, 130)])
         d.rectangle([x, y, x + 10, y + 5], fill=c)
-    d.text((W // 2, 70), "まとめ：手取りが増えない理由", font=F(BOLD, 36),
+    summary_title = data.get("summary_title", "まとめ：手取りが増えない理由")
+    d.text((W // 2, 70), summary_title, font=F(BOLD, _fit(d, summary_title, 36, 540)),
            fill=TEAL, anchor="mm", stroke_width=5, stroke_fill=AMBER_LIGHT)
     _badge(d, 660, 66, 27)
     d.rounded_rectangle([24, 128, 696, 1108], radius=30, fill=(255, 255, 255, 255),

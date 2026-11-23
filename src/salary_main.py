@@ -15,7 +15,7 @@ sys.path.insert(0, os.path.join(ROOT, "src"))
 import tax_factcheck, salary_cards, music  # noqa: E402
 from tax_main import TAX_THEME, LANDING  # noqa: E402
 
-SEGMENTS = [4, 6, 8, 8, 8, 8, 8, 11]  # title, list, 5 detail cards, summary = 61s
+SEGMENTS = [5, 7, 9, 9, 9, 9, 9, 13]  # title, list, 5 detail cards, summary = 70s (v4)
 TOTAL = sum(SEGMENTS)
 
 NOTE = "※数値は国税庁・協会けんぽ等の公表値です。本人負担率は各料率からの試算です"
@@ -43,11 +43,11 @@ def build_video(data, outdir):
     dur = subprocess.check_output(
         ["ffprobe", "-v", "error", "-show_entries", "format=duration",
          "-of", "default=noprint_wrappers=1:nokey=1", video]).decode().strip()
-    if not (61.0 <= float(dur) <= 63.0):
-        raise RuntimeError(f"video duration {dur}s is not in 61-63s")
+    if not (65.0 <= float(dur) <= 75.0):
+        raise RuntimeError(f"video duration {dur}s is not in 65-75s")
     probe = os.path.join(outdir, "probe")
     os.makedirs(probe, exist_ok=True)
-    for t in (2, 7, 14, 22, 30, 38, 46, 56):
+    for t in (2, 8, 16, 25, 34, 43, 52, 63):
         subprocess.run(["ffmpeg", "-nostdin", "-y", "-v", "error", "-ss", str(t),
                         "-i", video, "-frames:v", "1", "-q:v", "4",
                         os.path.join(probe, f"frame_{t}s.jpg")], check=True)
@@ -67,7 +67,8 @@ def youtube_texts(data):
     lines = ["平均給与は2025年に487万円と、名目では過去最高です。",
              "それでも手取りが増えた実感が薄い理由を、公式統計の数字で解説します。", ""]
     for p in data["picks"]:
-        lines.append(f"■ {p['name']}")
+        stage = p.get("stage", "")
+        lines.append(f"■ 【{stage}】{p['name']}" if stage else f"■ {p['name']}")
         for ln in p["detail_lines"]:
             lines.append(f"・{ln}")
         lines.append("")
