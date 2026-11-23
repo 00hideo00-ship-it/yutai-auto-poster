@@ -118,8 +118,17 @@ def list_card(data, out):
 def detail_card(data, idx, out):
     p = data["picks"][idx]
     img, d = _base(p["name"], f"理由 {idx+1}／{len(data['picks'])}")
+    # Message line (v3, Hide 2026-11-23): the card's one-line conclusion on
+    # an amber band directly under the header, so a first-time viewer gets
+    # the point before the detail rows. Rows shift down to make room.
+    msg = p["message"]
+    d.rounded_rectangle([36, 206, 684, 276], radius=22, fill=AMBER + (255,),
+                        outline=TEAL + (255,), width=3)
+    d.polygon([(64, 228), (64, 254), (86, 241)], fill=TEAL_DARK)
+    size = _fit(d, msg, 34, 540)
+    d.text((W // 2 + 14, 241), msg, font=F(BOLD, size), fill=TEAL_DARK, anchor="mm")
     lines = p["detail_lines"]
-    y = 250
+    y = 292
     for ln in lines:
         d.rounded_rectangle([36, y, 684, y + 128], radius=22, fill=(255, 255, 255, 255),
                             outline=TEAL + (255,), width=3)
