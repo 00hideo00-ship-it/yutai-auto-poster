@@ -85,7 +85,9 @@ def _detail_rows(d, lines, y0=226):
 
 def title_card(data, out):
     """Opening title card (Hide's rule, 2026-11-15): the video title is
-    centered on screen so viewers know the topic immediately."""
+    centered on screen so viewers know the topic immediately.
+    Hook rule (2026-11-18): the hook pill below the title carries the
+    concrete amount / deadline the viewer gains, not just the theme."""
     img = Image.new("RGB", (W, H), BG)
     d = ImageDraw.Draw(img, "RGBA")
     _bubbles(d)
@@ -93,12 +95,21 @@ def title_card(data, out):
     _badge(d, 646, 76, 37)
     d.text((W // 2, 552), data["stock"]["name"], font=F(BOLD, 76), fill=NAVY_DARK,
            anchor="mm", stroke_width=6, stroke_fill=WHITE)
-    d.text((W // 2, 672), "株主優待 深掘り", font=F(BOLD, 64), fill=NAVY_DARK,
+    d.text((W // 2, 672), data.get("title_angle_label", "株主優待 深掘り"),
+           font=F(BOLD, 64), fill=NAVY_DARK,
            anchor="mm", stroke_width=5, stroke_fill=WHITE)
     d.rounded_rectangle([120, 756, 600, 830], radius=37, fill=NAVY_DARK + (255,))
     d.text((W // 2, 793),
            f"コード {data['stock']['code']}・{data['stock']['market']}",
            font=F(BOLD, 28), fill=LIGHT_BLUE, anchor="mm")
+    hook = data.get("title_hook", "")
+    if hook:
+        d.rounded_rectangle([70, 920, 650, 1000], radius=40, fill=NAVY_DARK + (255,),
+                            outline=LIGHT_BLUE + (255,), width=3)
+        size = 28
+        while size > 18 and d.textlength(hook, font=F(BOLD, size)) > 540:
+            size -= 1
+        d.text((W // 2, 960), hook, font=F(BOLD, size), fill=LIGHT_BLUE, anchor="mm")
     d.text((W // 2, H - 42), FOOTER_TEXT, font=F(REG, 20), fill=LIGHT_BLUE, anchor="mm")
     img.save(out); return out
 
@@ -118,7 +129,7 @@ def deep_card(data, card, out):
 
 
 def caution_card(data, out):
-    img, d = _base("注意点", "2027年から条件が変わる")
+    img, d = _base("注意点", data.get("caution_subtitle", "条件と期限に注意"))
     _detail_rows(d, data["caution_lines"])
     _footer(d)
     img.save(out); return out
